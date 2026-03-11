@@ -1,0 +1,97 @@
+name: Package and Release Extension
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Get release version
+        id: version
+        run: echo "VERSION=${{ github.event.release.tag_name }}" >> $GITHUB_OUTPUT
+
+      - name: Update version in manifest.json
+        run: |
+          VERSION="${{ steps.version.outputs.VERSION }}"
+          VERSION="${VERSION#v}"
+          jq --arg v "$VERSION" '.version = $v' manifest.json > manifest.tmp.json
+          mv manifest.tmp.json manifest.json
+
+      - name: Package extension as .zip
+        run: |
+          zip -r OmniSponsorBlock.zip . \
+            --exclude "*.git*" \
+            --exclude ".github/*" \
+            --exclude "*.md" \
+            --exclude "*.zip" \
+            --exclude "*.crx" \
+            --exclude "updates.xml"
+
+      - name: Install Chromium
+        run: sudo apt-get install -y chromium-browser || sudo apt-get install -y chromium
+
+      - name: Generate CRX key
+        run: |
+          if [ ! -f key.pem ]; then
+            openssl genrsa -out key.pem 2048
+          fi
+
+      - name: Pack extension as .crx
+        run: |
+          CHROMIUM=$(which chromium-browser || which chromium)
+          $CHROMIUM --pack-extension=$(pwd) --pack-extension-key=key.pem --no-sandbox 2>/dev/null || true
+          if [ -f "../OmniSponsorBlock.crx" ]; then
+            mv ../OmniSponsorBlock.crx ./OmniSponsorBlock.crx
+          fi
+
+      - name: Update updates.xml with new version
+        run: |
+          VERSION="${{ steps.version.outputs.VERSION }}"
+          VERSION="${VERSION#v}"
+          cat > updates.xml <<EOF
+          <?xml version="1.0" encoding="UTF-8"?>
+          <gupdate xmlns="http://www.google.com/update2/response" protocol="2.0">
+            <app appid="${{ secrets.EXTENSION_ID }}">
+              <updatecheck
+                codebase="https://sbhushan01.github.io/OmniSponsorBlock/OmniSponsorBlock.crx"
+                version="${VERSION}" />
+            </app>
+          </gupdate>
+          EOF
+
+      - name: Commit updated manifest.json and updates.xml
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add manifest.json updates.xml
+          git diff --cached --quiet || git commit -m "chore: bump version to ${{ steps.version.outputs.VERSION }}"
+          git push origin main
+
+      - name: Upload .zip to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: OmniSponsorBlock.zip
+
+      - name: Upload .crx to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: OmniSponsorBlock.crx
+
+      - name: Deploy updates.xml and .crx to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./
+          include_files: |
+            updates.xml
+            OmniSponsorBlock.crx
+          keep_files: true
