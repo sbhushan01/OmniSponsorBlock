@@ -2,6 +2,11 @@
 
 **Skip sponsors and unwanted segments on YouTube videos and Spotify podcasts — in one extension.**
 
+![License: LGPL-3.0](https://img.shields.io/badge/License-LGPL%203.0-blue.svg)
+![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)
+![Chrome](https://img.shields.io/badge/Chrome-Manifest%20V3-yellow.svg)
+![Firefox](https://img.shields.io/badge/Firefox-Manifest%20V2-orange.svg)
+
 OmniSponsorBlock combines [SponsorBlock](https://github.com/ajayyy/SponsorBlock) (YouTube) and [Spot-SponsorBlock](https://github.com/Spot-SponsorBlock/Spot-SponsorBlock-Extension) (Spotify) into a single browser extension. Instead of installing and managing two separate extensions, you get unified sponsor-skipping across both platforms with a shared configuration and popup.
 
 ---
@@ -33,7 +38,7 @@ OmniSponsorBlock combines [SponsorBlock](https://github.com/ajayyy/SponsorBlock)
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/OmniSponsorBlock
+git clone https://github.com/sbhushan01/OmniSponsorBlock
 cd OmniSponsorBlock
 
 # Initialize submodules (maze-utils)
