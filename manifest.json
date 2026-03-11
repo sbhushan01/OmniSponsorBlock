@@ -103,23 +103,6 @@
   ],
   "content_scripts": [
     {
-      "world": "MAIN",
-      "js": [
-        "./js/document.js"
-      ],
-      "matches": [
-        "https://*.youtube.com/*",
-        "https://www.youtubekids.com/*",
-        "https://www.youtube-nocookie.com/embed/*",
-        "https://open.spotify.com/*"
-      ],
-      "exclude_matches": [
-        "https://accounts.youtube.com/RotateCookiesPage*"
-      ],
-      "all_frames": true,
-      "run_at": "document_start"
-    },
-    {
       "world": "ISOLATED",
       "js": [
         "./js/content.js"
