@@ -90,6 +90,7 @@
         "content.css",
         "shared.css",
         "js/document.js",
+        "js/popup-guard.js",
         "libs/Source+Sans+Pro.css",
         "libs/6xKydSBYKcSV-LCoeQqfX1RYOo3ig4vwlxdu.woff2",
         "libs/6xKydSBYKcSV-LCoeQqfX1RYOo3ig4vwmRduz8A.woff2",
