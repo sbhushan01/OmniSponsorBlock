@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Welcome to OmniSponsorBlock</title>
+  <link rel="icon" href="../icons/IconSponsorBlocker32px.png" type="image/png" />
+  <link rel="stylesheet" href="../libs/Source+Sans+Pro.css" />
+  <link rel="stylesheet" href="welcome.css" />
+</head>
+<body>
+
+  <!-- ── Header ── -->
+  <header id="header">
+    <img src="../icons/IconSponsorBlocker64px.png" alt="OmniSponsorBlock logo" />
+    <span id="header-title">OmniSponsorBlock</span>
+    <span id="header-badge" title="Installed version">v<span id="version-badge">1.0.0</span></span>
+  </header>
+
+  <!-- ── Main page ── -->
+  <main id="page">
+
+    <!-- Update banner (shown when a newer release is available) -->
+    <div id="update-banner" role="status">
+      <span>🎉 A new version is available!</span>
+      <a id="update-link" href="#" target="_blank" rel="noopener noreferrer">Download update →</a>
+    </div>
+
+    <!-- Hero -->
+    <section id="hero">
+      <img id="hero-logo" src="../icons/LogoSponsorBlocker256px.png" alt="OmniSponsorBlock logo" />
+      <h1>Welcome to the Unified SponsorBlock Experience.</h1>
+      <p>
+        One extension. Two powerhouses. Skip sponsors and self-promos on YouTube,
+        and automatically skip podcast sponsor segments on Spotify — all from a
+        single, unified tool.
+      </p>
+    </section>
+
+    <!-- Feature pills -->
+    <div id="features" role="list" aria-label="Key features">
+      <div class="feature-pill" role="listitem"><span class="pill-dot"></span>Skip YouTube sponsors</div>
+      <div class="feature-pill" role="listitem"><span class="pill-dot"></span>Skip Spotify podcast ads</div>
+      <div class="feature-pill" role="listitem"><span class="pill-dot"></span>Community-powered database</div>
+      <div class="feature-pill" role="listitem"><span class="pill-dot"></span>12 segment categories</div>
+      <div class="feature-pill" role="listitem"><span class="pill-dot"></span>Auto-chapter highlights</div>
+      <div class="feature-pill" role="listitem"><span class="pill-dot"></span>DeArrow titles &amp; thumbnails</div>
+    </div>
+
+    <!-- Developer -->
+    <section class="card" id="developer-card" aria-labelledby="developer-heading">
+      <div class="card-label" id="developer-heading">Developed &amp; Maintained by</div>
+      <div id="developer-info">
+        <div id="developer-avatar" aria-hidden="true">SB</div>
+        <div id="developer-details">
+          <h2>Sushant Bhushan</h2>
+          <p>
+            Combined SponsorBlock and Spot-SponsorBlock into a single unified
+            Chrome extension — OmniSponsorBlock.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Credits -->
+    <section class="card" aria-labelledby="credits-heading">
+      <div class="card-label" id="credits-heading">Credits &amp; Original Creators</div>
+      <div id="credits-list">
+
+        <div class="credit-item">
+          <div class="credit-icon">
+            <img src="../icons/LogoSponsorBlocker256px.png" alt="SponsorBlock logo" />
+          </div>
+          <div class="credit-text">
+            <h3>SponsorBlock</h3>
+            <p>
+              The original YouTube sponsor-skipping extension — created and maintained by
+              <a href="https://ajay.app" target="_blank" rel="noopener noreferrer">Ajay Ramachandran (Ajayyy)</a>.
+              Powers all YouTube skip functionality in this extension.
+            </p>
+          </div>
+        </div>
+
+        <div class="credit-item">
+          <div class="credit-icon">
+            <img src="../icons/IconSponsorBlocker64px.png" alt="Spot-SponsorBlock logo" />
+          </div>
+          <div class="credit-text">
+            <h3>Spot-SponsorBlock</h3>
+            <p>
+              Brought sponsor-skipping to Spotify podcasts.
+              The Spotify integration in OmniSponsorBlock is built upon the
+              <a href="https://github.com/nicholasMeadows/Spot-SponsorBlock" target="_blank" rel="noopener noreferrer">Spot-SponsorBlock</a>
+              project.
+            </p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <div id="cta-area">
+      <button id="get-started-btn" type="button">
+        ⚙️ &nbsp;Get Started
+      </button>
+      <p id="cta-note">Opens the extension settings — customise your skip behaviour, categories, and more.</p>
+    </div>
+
+  </main>
+
+  <!-- ── Footer ── -->
+  <footer id="footer">
+    OmniSponsorBlock is built on open-source work.
+    View the source on
+    <a href="https://github.com/sbhushan01/OmniSponsorBlock" target="_blank" rel="noopener noreferrer">GitHub</a>
+    · Licensed under LGPL-3.0
+  </footer>
+
+  <script src="welcome.js"></script>
+</body>
+</html>

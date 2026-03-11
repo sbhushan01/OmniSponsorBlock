@@ -1,0 +1,84 @@
+name: Release Extension
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - '**.md'
+      - '.github/**'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    # Skip commits made by this workflow itself to prevent infinite loops.
+    if: ${{ !contains(github.event.head_commit.message, '[skip ci]') && github.actor != 'github-actions[bot]' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # ── Validate and bump patch version in manifest.json ─────────────────────
+      - name: Bump patch version
+        id: version
+        run: |
+          CURRENT=$(jq -r '.version' manifest.json)
+          # Validate that version is exactly MAJOR.MINOR.PATCH
+          if ! echo "$CURRENT" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "::error::manifest.json version '$CURRENT' is not in MAJOR.MINOR.PATCH format"
+            exit 1
+          fi
+          IFS='.' read -r MAJOR MINOR PATCH <<< "$CURRENT"
+          NEW_PATCH=$((PATCH + 1))
+          NEW_VERSION="${MAJOR}.${MINOR}.${NEW_PATCH}"
+          # Write new version into manifest.json
+          TMP=$(mktemp)
+          jq --arg v "$NEW_VERSION" '.version = $v' manifest.json > "$TMP" && mv "$TMP" manifest.json
+          echo "version=$NEW_VERSION" >> "$GITHUB_OUTPUT"
+          echo "Bumped version: $CURRENT → $NEW_VERSION"
+
+      # ── Commit the updated manifest ───────────────────────────────────────────
+      - name: Commit version bump
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add manifest.json
+          git commit -m "chore: bump version to ${{ steps.version.outputs.version }} [skip ci]"
+          git push
+
+      # ── Package the extension as a zip ───────────────────────────────────────
+      - name: Package extension
+        run: |
+          ZIP_NAME="OmniSponsorBlock-v${{ steps.version.outputs.version }}.zip"
+          zip -r "$ZIP_NAME" . \
+            --exclude ".git/*" \
+            --exclude ".github/*" \
+            --exclude "*.map" \
+            --exclude "oss-attribution/*"
+          echo "ZIP_NAME=$ZIP_NAME" >> "$GITHUB_ENV"
+
+      # ── Create GitHub Release ─────────────────────────────────────────────────
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: "v${{ steps.version.outputs.version }}"
+          name: "OmniSponsorBlock v${{ steps.version.outputs.version }}"
+          body: |
+            ## OmniSponsorBlock v${{ steps.version.outputs.version }}
+
+            Automated release — built from the latest commit on `main`.
+
+            ### Installation
+            1. Download the `.zip` file below.
+            2. Extract the archive.
+            3. In Chrome, open `chrome://extensions`, enable **Developer mode**, and click **Load unpacked**.
+            4. Select the extracted folder.
+
+            > Existing installations will see the in-extension update banner on the Welcome page.
+          files: "${{ env.ZIP_NAME }}"
+          draft: false
+          prerelease: false
