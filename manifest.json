@@ -25,6 +25,7 @@
   },
   "host_permissions": [
     "https://*.youtube.com/*",
+    "https://www.youtubekids.com/*",
     "https://sponsor.ajay.app/*",
     "https://open.spotify.com/*"
   ],
@@ -105,6 +106,7 @@
       ],
       "matches": [
         "https://*.youtube.com/*",
+        "https://www.youtubekids.com/*",
         "https://www.youtube-nocookie.com/embed/*",
         "https://open.spotify.com/*"
       ],
@@ -125,6 +127,7 @@
       ],
       "matches": [
         "https://*.youtube.com/*",
+        "https://www.youtubekids.com/*",
         "https://www.youtube-nocookie.com/embed/*"
       ],
       "exclude_matches": [
