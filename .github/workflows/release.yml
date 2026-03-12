@@ -55,7 +55,10 @@ jobs:
             --exclude ".github/*" \
             --exclude "*.map" \
             --exclude "oss-attribution/*" \
-            --exclude "key.pem"
+            --exclude "key.pem" \
+            --exclude "*.crx" \
+            --exclude "*.zip" \
+            --exclude "updates.xml"
           echo "ZIP_NAME=$ZIP_NAME" >> "$GITHUB_ENV"
       - name: Commit version bump and updates.xml
         run: |
