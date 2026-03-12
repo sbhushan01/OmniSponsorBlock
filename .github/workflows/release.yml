@@ -40,7 +40,7 @@ jobs:
       - name: Install crx3 and pack .crx
         run: |
           npm install -g crx3
-          crx3 pack . --key key.pem --crx OmniSponsorBlock.crx
+          crx3 pack $(pwd) --key $(pwd)/key.pem --crx $(pwd)/OmniSponsorBlock.crx
           rm -f key.pem
 
       - name: Generate updates.xml
