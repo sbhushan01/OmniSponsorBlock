@@ -95,10 +95,13 @@ jobs:
 
       - name: Prepare GitHub Pages folder
         run: |
-          mkdir gh-pages-dist
-          cp OmniSponsorBlock.crx gh-pages-dist/
-          cp updates.xml gh-pages-dist/
-
+          echo "=== Checking if .crx exists ==="
+          ls -la *.crx || echo "NO .crx FILE FOUND"
+          mkdir -p gh-pages-dist
+          cp OmniSponsorBlock.crx gh-pages-dist/ || echo "COPY FAILED"
+          touch gh-pages-dist/.nojekyll
+          ls -la gh-pages-dist/
+          
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
