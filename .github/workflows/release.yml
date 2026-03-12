@@ -44,17 +44,20 @@ jobs:
           rm -f key.pem
 
       - name: Generate updates.xml
+        env:
+          EXT_ID: ${{ secrets.EXTENSION_ID }}
         run: |
-          cat > updates.xml <<EOF
-          <?xml version="1.0" encoding="UTF-8"?>
-          <gupdate xmlns="http://www.google.com/update2/response" protocol="2.0">
-            <app appid="${{ secrets.EXTENSION_ID }}">
-              <updatecheck
-                codebase="https://sbhushan01.github.io/OmniSponsorBlock/OmniSponsorBlock.crx"
-                version="${{ steps.version.outputs.version }}" />
-            </app>
-          </gupdate>
-          EOF
+          echo "Extension ID is: [$EXT_ID]"
+          cat > updates.xml << EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<gupdate xmlns="http://www.google.com/update2/response" protocol="2.0">
+  <app appid="${EXT_ID}">
+    <updatecheck
+      codebase="https://sbhushan01.github.io/OmniSponsorBlock/OmniSponsorBlock.crx"
+      version="${{ steps.version.outputs.version }}" />
+  </app>
+</gupdate>
+EOF
 
       - name: Package extension as .zip
         run: |
@@ -95,13 +98,11 @@ jobs:
 
       - name: Prepare GitHub Pages folder
         run: |
-          echo "=== Checking if .crx exists ==="
-          ls -la *.crx || echo "NO .crx FILE FOUND"
           mkdir -p gh-pages-dist
-          cp OmniSponsorBlock.crx gh-pages-dist/ || echo "COPY FAILED"
+          cp OmniSponsorBlock.crx gh-pages-dist/
+          cp updates.xml gh-pages-dist/
           touch gh-pages-dist/.nojekyll
-          ls -la gh-pages-dist/
-          
+
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
