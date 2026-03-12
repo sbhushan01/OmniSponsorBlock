@@ -30,4 +30,14 @@
     }
   });
 })();
+
+// Keep service worker alive to prevent tab-update listener gaps
+(function keepAlive() {
+  try {
+    if (chrome.alarms) {
+      chrome.alarms.create('keepAlive', { periodInMinutes: 0.4 });
+      chrome.alarms.onAlarm.addListener(() => {});
+    }
+  } catch(e) {}
+})();
 //# sourceMappingURL=background.js.map
