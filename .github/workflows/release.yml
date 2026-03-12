@@ -1,5 +1,4 @@
 name: Release Extension
-
 on:
   push:
     branches:
@@ -7,13 +6,10 @@ on:
     paths-ignore:
       - '**.md'
       - '.github/**'
-
 permissions:
   contents: write
-
 jobs:
   release:
-    # Skip commits made by this workflow itself to prevent infinite loops.
     if: ${{ !contains(github.event.head_commit.message, '[skip ci]') && github.actor != 'github-actions[bot]' }}
     runs-on: ubuntu-latest
     steps:
@@ -22,12 +18,10 @@ jobs:
         with:
           fetch-depth: 0
 
-      # ── Validate and bump patch version in manifest.json ─────────────────────
       - name: Bump patch version
         id: version
         run: |
           CURRENT=$(jq -r '.version' manifest.json)
-          # Validate that version is exactly MAJOR.MINOR.PATCH
           if ! echo "$CURRENT" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+$'; then
             echo "::error::manifest.json version '$CURRENT' is not in MAJOR.MINOR.PATCH format"
             exit 1
@@ -35,33 +29,52 @@ jobs:
           IFS='.' read -r MAJOR MINOR PATCH <<< "$CURRENT"
           NEW_PATCH=$((PATCH + 1))
           NEW_VERSION="${MAJOR}.${MINOR}.${NEW_PATCH}"
-          # Write new version into manifest.json
           TMP=$(mktemp)
           jq --arg v "$NEW_VERSION" '.version = $v' manifest.json > "$TMP" && mv "$TMP" manifest.json
           echo "version=$NEW_VERSION" >> "$GITHUB_OUTPUT"
           echo "Bumped version: $CURRENT → $NEW_VERSION"
 
-      # ── Commit the updated manifest ───────────────────────────────────────────
-      - name: Commit version bump
-        run: |
-          git config user.name  "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add manifest.json
-          git commit -m "chore: bump version to ${{ steps.version.outputs.version }} [skip ci]"
-          git push
+      - name: Restore signing key
+        run: echo "${{ secrets.CRX_PRIVATE_KEY }}" | base64 --decode > key.pem
 
-      # ── Package the extension as a zip ───────────────────────────────────────
-      - name: Package extension
+      - name: Install crx3 and pack .crx
+        run: |
+          npm install -g crx3
+          crx3 pack . --key key.pem --crx OmniSponsorBlock.crx
+          rm -f key.pem
+
+      - name: Generate updates.xml
+        run: |
+          cat > updates.xml <<EOF
+          <?xml version="1.0" encoding="UTF-8"?>
+          <gupdate xmlns="http://www.google.com/update2/response" protocol="2.0">
+            <app appid="${{ secrets.EXTENSION_ID }}">
+              <updatecheck
+                codebase="https://sbhushan01.github.io/OmniSponsorBlock/OmniSponsorBlock.crx"
+                version="${{ steps.version.outputs.version }}" />
+            </app>
+          </gupdate>
+          EOF
+
+      - name: Package extension as .zip
         run: |
           ZIP_NAME="OmniSponsorBlock-v${{ steps.version.outputs.version }}.zip"
           zip -r "$ZIP_NAME" . \
             --exclude ".git/*" \
             --exclude ".github/*" \
             --exclude "*.map" \
-            --exclude "oss-attribution/*"
+            --exclude "oss-attribution/*" \
+            --exclude "key.pem"
           echo "ZIP_NAME=$ZIP_NAME" >> "$GITHUB_ENV"
 
-      # ── Create GitHub Release ─────────────────────────────────────────────────
+      - name: Commit version bump and updates.xml
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add manifest.json updates.xml
+          git commit -m "chore: bump version to ${{ steps.version.outputs.version }} [skip ci]"
+          git push
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
@@ -69,16 +82,26 @@ jobs:
           name: "OmniSponsorBlock v${{ steps.version.outputs.version }}"
           body: |
             ## OmniSponsorBlock v${{ steps.version.outputs.version }}
-
             Automated release — built from the latest commit on `main`.
-
             ### Installation
-            1. Download the `.zip` file below.
-            2. Extract the archive.
-            3. In Chrome, open `chrome://extensions`, enable **Developer mode**, and click **Load unpacked**.
-            4. Select the extracted folder.
-
-            > Existing installations will see the in-extension update banner on the Welcome page.
-          files: "${{ env.ZIP_NAME }}"
+            1. Download the `.zip` file below and extract it.
+            2. In Chrome, open `chrome://extensions`, enable **Developer mode**, click **Load unpacked**.
+            3. Select the extracted folder.
+          files: |
+            ${{ env.ZIP_NAME }}
+            OmniSponsorBlock.crx
           draft: false
           prerelease: false
+
+      - name: Prepare GitHub Pages folder
+        run: |
+          mkdir gh-pages-dist
+          cp OmniSponsorBlock.crx gh-pages-dist/
+          cp updates.xml gh-pages-dist/
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./gh-pages-dist
+          keep_files: true
