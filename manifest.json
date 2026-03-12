@@ -1,7 +1,7 @@
 {
   "name": "__MSG_fullName__",
   "short_name": "OmniSponsorBlock",
-  "version": "1.0.11",
+  "version": "1.0.12",
   "update_url": "https://sbhushan01.github.io/OmniSponsorBlock/updates.xml",
   "default_locale": "en",
   "description": "__MSG_Description__",
