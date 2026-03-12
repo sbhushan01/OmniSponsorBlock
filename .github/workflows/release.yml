@@ -17,7 +17,6 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
       - name: Bump patch version
         id: version
         run: |
@@ -33,32 +32,21 @@ jobs:
           jq --arg v "$NEW_VERSION" '.version = $v' manifest.json > "$TMP" && mv "$TMP" manifest.json
           echo "version=$NEW_VERSION" >> "$GITHUB_OUTPUT"
           echo "Bumped version: $CURRENT → $NEW_VERSION"
-
       - name: Restore signing key
         run: echo "${{ secrets.CRX_PRIVATE_KEY }}" | base64 --decode > key.pem
-
       - name: Install crx3 and pack .crx
         run: |
           npm install -g crx3
           crx3 pack $(pwd) --key $(pwd)/key.pem --crx $(pwd)/OmniSponsorBlock.crx
           rm -f key.pem
-
       - name: Generate updates.xml
         env:
           EXT_ID: ${{ secrets.EXTENSION_ID }}
+          VERSION: ${{ steps.version.outputs.version }}
         run: |
           echo "Extension ID is: [$EXT_ID]"
-          cat > updates.xml << EOF
-<?xml version="1.0" encoding="UTF-8"?>
-<gupdate xmlns="http://www.google.com/update2/response" protocol="2.0">
-  <app appid="${EXT_ID}">
-    <updatecheck
-      codebase="https://sbhushan01.github.io/OmniSponsorBlock/OmniSponsorBlock.crx"
-      version="${{ steps.version.outputs.version }}" />
-  </app>
-</gupdate>
-EOF
-
+          printf '<?xml version="1.0" encoding="UTF-8"?>\n<gupdate xmlns="http://www.google.com/update2/response" protocol="2.0">\n  <app appid="%s">\n    <updatecheck codebase="https://sbhushan01.github.io/OmniSponsorBlock/OmniSponsorBlock.crx" version="%s" />\n  </app>\n</gupdate>\n' "$EXT_ID" "$VERSION" > updates.xml
+          cat updates.xml
       - name: Package extension as .zip
         run: |
           ZIP_NAME="OmniSponsorBlock-v${{ steps.version.outputs.version }}.zip"
@@ -69,7 +57,6 @@ EOF
             --exclude "oss-attribution/*" \
             --exclude "key.pem"
           echo "ZIP_NAME=$ZIP_NAME" >> "$GITHUB_ENV"
-
       - name: Commit version bump and updates.xml
         run: |
           git config user.name "github-actions[bot]"
@@ -77,7 +64,6 @@ EOF
           git add manifest.json updates.xml
           git commit -m "chore: bump version to ${{ steps.version.outputs.version }} [skip ci]"
           git push
-
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
@@ -95,14 +81,12 @@ EOF
             OmniSponsorBlock.crx
           draft: false
           prerelease: false
-
       - name: Prepare GitHub Pages folder
         run: |
           mkdir -p gh-pages-dist
           cp OmniSponsorBlock.crx gh-pages-dist/
           cp updates.xml gh-pages-dist/
           touch gh-pages-dist/.nojekyll
-
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
