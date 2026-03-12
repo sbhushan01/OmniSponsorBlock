@@ -10,21 +10,33 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Get release version
         id: version
-        run: echo "VERSION=${{ github.event.release.tag_name }}" >> $GITHUB_OUTPUT
+        run: |
+          VERSION="${{ github.event.release.tag_name }}"
+          VERSION="${VERSION#v}"
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Update version in manifest.json
         run: |
-          VERSION="${{ steps.version.outputs.VERSION }}"
-          VERSION="${VERSION#v}"
-          jq --arg v "$VERSION" '.version = $v' manifest.json > manifest.tmp.json
+          jq --arg v "${{ steps.version.outputs.VERSION }}" '.version = $v' manifest.json > manifest.tmp.json
           mv manifest.tmp.json manifest.json
+
+      - name: Restore signing key
+        run: echo "${{ secrets.CRX_PRIVATE_KEY }}" | base64 --decode > key.pem
+
+      - name: Install crx3
+        run: npm install -g crx3
+
+      - name: Pack extension as .crx
+        run: crx3 pack . --key key.pem --crx OmniSponsorBlock.crx
+
+      - name: Wipe key from disk
+        run: rm -f key.pem
 
       - name: Package extension as .zip
         run: |
@@ -34,41 +46,23 @@ jobs:
             --exclude "*.md" \
             --exclude "*.zip" \
             --exclude "*.crx" \
-            --exclude "updates.xml"
+            --exclude "updates.xml" \
+            --exclude "key.pem"
 
-      - name: Install Chromium
-        run: sudo apt-get install -y chromium-browser || sudo apt-get install -y chromium
-
-      - name: Generate CRX key
+      - name: Update updates.xml
         run: |
-          if [ ! -f key.pem ]; then
-            openssl genrsa -out key.pem 2048
-          fi
-
-      - name: Pack extension as .crx
-        run: |
-          CHROMIUM=$(which chromium-browser || which chromium)
-          $CHROMIUM --pack-extension=$(pwd) --pack-extension-key=key.pem --no-sandbox 2>/dev/null || true
-          if [ -f "../OmniSponsorBlock.crx" ]; then
-            mv ../OmniSponsorBlock.crx ./OmniSponsorBlock.crx
-          fi
-
-      - name: Update updates.xml with new version
-        run: |
-          VERSION="${{ steps.version.outputs.VERSION }}"
-          VERSION="${VERSION#v}"
           cat > updates.xml <<EOF
           <?xml version="1.0" encoding="UTF-8"?>
           <gupdate xmlns="http://www.google.com/update2/response" protocol="2.0">
             <app appid="${{ secrets.EXTENSION_ID }}">
               <updatecheck
                 codebase="https://sbhushan01.github.io/OmniSponsorBlock/OmniSponsorBlock.crx"
-                version="${VERSION}" />
+                version="${{ steps.version.outputs.VERSION }}" />
             </app>
           </gupdate>
           EOF
 
-      - name: Commit updated manifest.json and updates.xml
+      - name: Commit manifest.json and updates.xml
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -86,12 +80,15 @@ jobs:
         with:
           files: OmniSponsorBlock.crx
 
-      - name: Deploy updates.xml and .crx to GitHub Pages
+      - name: Prepare GitHub Pages folder
+        run: |
+          mkdir gh-pages-dist
+          cp OmniSponsorBlock.crx gh-pages-dist/
+          cp updates.xml gh-pages-dist/
+
+      - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./
-          include_files: |
-            updates.xml
-            OmniSponsorBlock.crx
+          publish_dir: ./gh-pages-dist
           keep_files: true
