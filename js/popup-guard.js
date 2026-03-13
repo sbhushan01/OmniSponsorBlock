@@ -95,7 +95,7 @@
         }
       } else {
         // sendMessage(message, ...)
-        if (typeof messageOrOptions === "object" && typeof messageOrOptions !== "function") {
+        if (typeof messageOrOptions === "object") {
           _originalRuntimeSendMessage(extensionIdOrMessage, messageOrOptions, safeCallback);
         } else {
           _originalRuntimeSendMessage(extensionIdOrMessage, safeCallback);
