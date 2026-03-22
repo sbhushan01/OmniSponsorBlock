@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Get release version
         id: version
@@ -71,15 +71,14 @@ jobs:
           git diff --cached --quiet || git commit -m "chore: bump version to ${{ steps.version.outputs.VERSION }}"
           git push origin main
 
-      - name: Upload .zip to GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          files: OmniSponsorBlock.zip
-
-      - name: Upload .crx to GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          files: OmniSponsorBlock.crx
+      # Same rationale as release.yml: avoid softprops/action-gh-release on runners where its
+      # Node action runtime can fail; use gh CLI (preinstalled on ubuntu-latest).
+      - name: Upload extension assets to GitHub Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release upload "${{ github.event.release.tag_name }}" \
+            OmniSponsorBlock.zip OmniSponsorBlock.crx --clobber
 
       - name: Prepare GitHub Pages folder
         run: |
