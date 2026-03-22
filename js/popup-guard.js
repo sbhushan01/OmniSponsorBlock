@@ -21,6 +21,11 @@
     }
   }
 
+  /** Chrome message options are objects; typeof null === "object" must be excluded. */
+  function isSendOptions(value) {
+    return value !== null && typeof value === "object" && !Array.isArray(value);
+  }
+
   // Patch chrome.tabs.sendMessage to always handle lastError
   // and guard against invalidated extension context
   const _originalTabsSendMessage = chrome.tabs.sendMessage.bind(chrome.tabs);
@@ -32,7 +37,7 @@
     }
 
     let callback = typeof optionsOrCallback === "function" ? optionsOrCallback : maybeCallback;
-    const options = typeof optionsOrCallback === "object" ? optionsOrCallback : undefined;
+    const options = isSendOptions(optionsOrCallback) ? optionsOrCallback : undefined;
 
     const safeCallback = function (response) {
       try { void chrome.runtime.lastError; } catch (e) { /* context invalidated */ }
@@ -58,7 +63,10 @@
       let cb;
       if (typeof extensionIdOrMessage === "object" && typeof messageOrOptions === "function") {
         cb = messageOrOptions;
-      } else if (typeof messageOrOptions === "object" && typeof optionsOrCallback === "function") {
+      } else if (isSendOptions(messageOrOptions) && typeof optionsOrCallback === "function") {
+        cb = optionsOrCallback;
+      } else if (typeof extensionIdOrMessage === "string" && typeof optionsOrCallback === "function") {
+        // sendMessage(extensionId, message, callback)
         cb = optionsOrCallback;
       } else if (typeof maybeCallback === "function") {
         cb = maybeCallback;
@@ -72,8 +80,11 @@
     if (typeof extensionIdOrMessage === "object" && typeof messageOrOptions === "function") {
       // sendMessage(message, callback)
       callback = messageOrOptions;
-    } else if (typeof messageOrOptions === "object" && typeof optionsOrCallback === "function") {
+    } else if (isSendOptions(messageOrOptions) && typeof optionsOrCallback === "function") {
       // sendMessage(extensionId, message, callback) or sendMessage(message, options, callback)
+      callback = optionsOrCallback;
+    } else if (typeof extensionIdOrMessage === "string" && typeof optionsOrCallback === "function") {
+      // sendMessage(extensionId, message, callback) when message is not an options object
       callback = optionsOrCallback;
     } else if (typeof maybeCallback === "function") {
       callback = maybeCallback;
@@ -88,14 +99,14 @@
     try {
       if (typeof extensionIdOrMessage === "string") {
         // sendMessage(extensionId, message, ...)
-        if (typeof optionsOrCallback === "object") {
+        if (isSendOptions(optionsOrCallback)) {
           _originalRuntimeSendMessage(extensionIdOrMessage, messageOrOptions, optionsOrCallback, safeCallback);
         } else {
           _originalRuntimeSendMessage(extensionIdOrMessage, messageOrOptions, safeCallback);
         }
       } else {
         // sendMessage(message, ...)
-        if (typeof messageOrOptions === "object") {
+        if (isSendOptions(messageOrOptions)) {
           _originalRuntimeSendMessage(extensionIdOrMessage, messageOrOptions, safeCallback);
         } else {
           _originalRuntimeSendMessage(extensionIdOrMessage, safeCallback);

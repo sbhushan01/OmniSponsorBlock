@@ -27,15 +27,15 @@
   // Compares the installed version against the latest GitHub release and shows
   // a banner when a newer version is available.
   //
-  // Version parts are compared numerically. Non-numeric parts (e.g. pre-release
-  // suffixes like "1.0.0-beta") are treated as 0 so the comparison stays safe.
+  // Version parts are compared numerically. Only the leading digit run of each
+  // dot segment counts (e.g. "21-beta" → 21, not 21 conflated with "20").
   function parseVersionParts(v) {
     return v
       .replace(/^v/, "")
       .split(".")
       .map(function (part) {
-        const n = parseInt(part, 10);
-        return isNaN(n) ? 0 : n;
+        const match = /^(\d+)/.exec(part);
+        return match ? parseInt(match[1], 10) : 0;
       });
   }
 
