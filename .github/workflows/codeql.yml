@@ -1,5 +1,5 @@
-# Code scanning: checkout@v5 + codeql-action@v3 use the Node 24 JS action runtime (avoids Node 20 deprecation warnings).
-# If you still use GitHub "default" code scanning for this repo, disable it under Settings → Code security so only this workflow runs.
+# Code scanning: checkout@v5 + codeql-action@v4 (Node 24 runtime).
+# GitHub rejects SARIF from this workflow if repo "Code scanning" default setup is still on — disable it under Settings → Code security → Code scanning.
 name: CodeQL
 
 on:
@@ -33,16 +33,13 @@ jobs:
         uses: actions/checkout@v5
 
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@v3
+        uses: github/codeql-action/init@v4
         with:
           languages: ${{ matrix.language }}
-          build-mode: ${{ matrix.language == 'actions' && 'none' || 'autobuild' }}
-
-      - name: Autobuild
-        if: matrix.language != 'actions'
-        uses: github/codeql-action/autobuild@v3
+          # JS/TS and Actions only support build-mode "none" (autobuild is for compiled languages).
+          build-mode: none
 
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v3
+        uses: github/codeql-action/analyze@v4
         with:
           category: "/language:${{ matrix.language }}"
