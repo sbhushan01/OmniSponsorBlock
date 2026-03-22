@@ -1,18 +1,6 @@
 "use strict";
 
 (function () {
-  const SUPPORTED_PATTERNS = [
-    /^https:\/\/[^/]*\.youtube\.com\//,
-    /^https:\/\/www\.youtubekids\.com\//,
-    /^https:\/\/www\.youtube-nocookie\.com\/embed\//,
-    /^https:\/\/open\.spotify\.com\//
-  ];
-
-  function isSupported(url) {
-    if (!url) return false;
-    return SUPPORTED_PATTERNS.some(function (re) { return re.test(url); });
-  }
-
   function isExtensionContextValid() {
     try {
       return !!(chrome && chrome.runtime && chrome.runtime.id);
