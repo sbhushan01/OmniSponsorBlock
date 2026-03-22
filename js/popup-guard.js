@@ -32,26 +32,40 @@
   chrome.tabs.sendMessage = function (tabId, message, optionsOrCallback, maybeCallback) {
     if (!isExtensionContextValid()) {
       const cb = typeof optionsOrCallback === "function" ? optionsOrCallback : maybeCallback;
-      if (typeof cb === "function") cb(undefined);
-      return;
+      if (typeof cb === "function") {
+        cb(undefined);
+        return;
+      }
+      return Promise.resolve(undefined);
     }
 
     let callback = typeof optionsOrCallback === "function" ? optionsOrCallback : maybeCallback;
     const options = isSendOptions(optionsOrCallback) ? optionsOrCallback : undefined;
 
+    if (typeof callback !== "function") {
+      try {
+        if (options !== undefined) {
+          return _originalTabsSendMessage(tabId, message, options);
+        }
+        return _originalTabsSendMessage(tabId, message);
+      } catch (e) {
+        return Promise.reject(e);
+      }
+    }
+
     const safeCallback = function (response) {
       try { void chrome.runtime.lastError; } catch (e) { /* context invalidated */ }
-      if (callback) callback(response);
+      callback(response);
     };
 
     try {
-      if (options) {
+      if (options !== undefined) {
         _originalTabsSendMessage(tabId, message, options, safeCallback);
       } else {
         _originalTabsSendMessage(tabId, message, safeCallback);
       }
     } catch (e) {
-      if (callback) callback(undefined);
+      callback(undefined);
     }
   };
 
@@ -66,46 +80,58 @@
       } else if (isSendOptions(messageOrOptions) && typeof optionsOrCallback === "function") {
         cb = optionsOrCallback;
       } else if (typeof extensionIdOrMessage === "string" && typeof optionsOrCallback === "function") {
-        // sendMessage(extensionId, message, callback)
         cb = optionsOrCallback;
       } else if (typeof maybeCallback === "function") {
         cb = maybeCallback;
       }
-      if (typeof cb === "function") cb(undefined);
-      return;
+      if (typeof cb === "function") {
+        cb(undefined);
+        return;
+      }
+      return Promise.resolve(undefined);
     }
 
-    // Determine argument pattern
     let callback;
     if (typeof extensionIdOrMessage === "object" && typeof messageOrOptions === "function") {
-      // sendMessage(message, callback)
       callback = messageOrOptions;
     } else if (isSendOptions(messageOrOptions) && typeof optionsOrCallback === "function") {
-      // sendMessage(extensionId, message, callback) or sendMessage(message, options, callback)
       callback = optionsOrCallback;
     } else if (typeof extensionIdOrMessage === "string" && typeof optionsOrCallback === "function") {
-      // sendMessage(extensionId, message, callback) when message is not an options object
       callback = optionsOrCallback;
     } else if (typeof maybeCallback === "function") {
       callback = maybeCallback;
     }
 
+    if (typeof callback !== "function") {
+      try {
+        if (typeof extensionIdOrMessage === "string") {
+          if (isSendOptions(optionsOrCallback)) {
+            return _originalRuntimeSendMessage(extensionIdOrMessage, messageOrOptions, optionsOrCallback);
+          }
+          return _originalRuntimeSendMessage(extensionIdOrMessage, messageOrOptions);
+        }
+        if (isSendOptions(messageOrOptions)) {
+          return _originalRuntimeSendMessage(extensionIdOrMessage, messageOrOptions);
+        }
+        return _originalRuntimeSendMessage(extensionIdOrMessage);
+      } catch (e) {
+        return Promise.reject(e);
+      }
+    }
+
     const safeCallback = function (response) {
       try { void chrome.runtime.lastError; } catch (e) { /* context invalidated */ }
-      if (callback) callback(response);
+      callback(response);
     };
 
-    // Re-invoke with original args but replace callback with safe version
     try {
       if (typeof extensionIdOrMessage === "string") {
-        // sendMessage(extensionId, message, ...)
         if (isSendOptions(optionsOrCallback)) {
           _originalRuntimeSendMessage(extensionIdOrMessage, messageOrOptions, optionsOrCallback, safeCallback);
         } else {
           _originalRuntimeSendMessage(extensionIdOrMessage, messageOrOptions, safeCallback);
         }
       } else {
-        // sendMessage(message, ...)
         if (isSendOptions(messageOrOptions)) {
           _originalRuntimeSendMessage(extensionIdOrMessage, messageOrOptions, safeCallback);
         } else {
@@ -113,7 +139,7 @@
         }
       }
     } catch (e) {
-      if (callback) callback(undefined);
+      callback(undefined);
     }
   };
 })();
