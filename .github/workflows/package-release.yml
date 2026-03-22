@@ -11,8 +11,12 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
+      # Build from the exact tag this release points at (matches release.yml zips).
+      - name: Checkout release tag
         uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.release.tag_name }}
+          submodules: recursive
 
       - name: Get release version
         id: version
@@ -63,13 +67,25 @@ jobs:
           </gupdate>
           EOF
 
+      - name: Save built assets for upload and default-branch bump
+        run: |
+          mkdir -p /tmp/osb-release
+          cp manifest.json updates.xml OmniSponsorBlock.crx OmniSponsorBlock.zip /tmp/osb-release/
+
+      - name: Checkout default branch for version bump commit
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+          submodules: recursive
+
       - name: Commit manifest.json and updates.xml
         run: |
+          cp /tmp/osb-release/manifest.json /tmp/osb-release/updates.xml .
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add manifest.json updates.xml
           git diff --cached --quiet || git commit -m "chore: bump version to ${{ steps.version.outputs.VERSION }}"
-          git push origin main
+          git push origin "HEAD:refs/heads/${{ github.event.repository.default_branch }}"
 
       # Same rationale as release.yml: avoid softprops/action-gh-release on runners where its
       # Node action runtime can fail; use gh CLI (preinstalled on ubuntu-latest).
@@ -78,5 +94,4 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh release upload "${{ github.event.release.tag_name }}" \
-            OmniSponsorBlock.zip OmniSponsorBlock.crx --clobber
-
+            /tmp/osb-release/OmniSponsorBlock.zip /tmp/osb-release/OmniSponsorBlock.crx --clobber
