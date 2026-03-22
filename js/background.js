@@ -64,4 +64,23 @@
     }
   } catch(e) {}
 })();
+
+// Nudge Chrome to check self-hosted updates (manifest update_url); no-op on Firefox / store builds.
+(function requestSelfHostedUpdateCheck() {
+  try {
+    if (typeof chrome.runtime.requestUpdateCheck !== 'function') return;
+    const url = chrome.runtime.getManifest().update_url;
+    if (!url) return;
+    // Skip Chrome Web Store update service only — do not use url.includes('google.com')
+    // (that would wrongly skip hosts like notgoogle.com).
+    let host = '';
+    try {
+      host = new URL(url).hostname;
+    } catch (e) {
+      return;
+    }
+    if (/^clients\d*\.google\.com$/i.test(host)) return;
+    chrome.runtime.requestUpdateCheck(function () {});
+  } catch (e) {}
+})();
 //# sourceMappingURL=background.js.map

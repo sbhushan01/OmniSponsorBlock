@@ -7,8 +7,6 @@ on:
 
 permissions:
   contents: write      # needed by gh release create
-  pages: write         # needed by deploy-pages
-  id-token: write      # needed by deploy-pages OIDC
 
 jobs:
   # ── 1. Build all browser targets ───────────────────────────────────────────
@@ -72,29 +70,6 @@ jobs:
             --generate-notes \
             *.zip
 
-  # ── 3. Deploy update manifest to GitHub Pages ───────────────────────────────
-  #   peaceiris/actions-gh-pages@v4 has no Node 24 build.
-  #   Use the official actions/upload-pages-artifact + actions/deploy-pages instead.
-  deploy-pages:
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - uses: actions/checkout@v5
-
-      - name: Prepare Pages content
-        run: |
-          mkdir -p _site
-          cp updates.xml _site/updates.xml
-
-      # upload-pages-artifact runs on Node 24
-      - uses: actions/upload-pages-artifact@v3
-        with:
-          path: _site/
-
-      # deploy-pages runs on Node 24
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+  # GitHub Pages (updates.xml + OmniSponsorBlock.crx) is deployed by package-release.yml
+  # when a release is published. Do not deploy only updates.xml here: deploy-pages replaces
+  # the whole site and would remove the .crx, breaking chrome_update checks.

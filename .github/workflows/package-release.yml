@@ -49,12 +49,13 @@ jobs:
             --exclude "updates.xml" \
             --exclude "key.pem"
 
+      # appid must match chrome://extensions id for installs built with CRX_PRIVATE_KEY (see updates.xml in repo).
       - name: Update updates.xml
         run: |
           cat > updates.xml <<EOF
           <?xml version="1.0" encoding="UTF-8"?>
           <gupdate xmlns="http://www.google.com/update2/response" protocol="2.0">
-            <app appid="${{ secrets.cdgkmadgpjadkjjokfofnklgkejongok }}">
+            <app appid="igkgdedndffdoljpojoaedjioopnpneb">
               <updatecheck
                 codebase="https://sbhushan01.github.io/OmniSponsorBlock/OmniSponsorBlock.crx"
                 version="${{ steps.version.outputs.VERSION }}" />
