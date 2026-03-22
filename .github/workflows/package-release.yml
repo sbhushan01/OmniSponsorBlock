@@ -57,7 +57,7 @@ jobs:
           <gupdate xmlns="http://www.google.com/update2/response" protocol="2.0">
             <app appid="igkgdedndffdoljpojoaedjioopnpneb">
               <updatecheck
-                codebase="https://sbhushan01.github.io/OmniSponsorBlock/OmniSponsorBlock.crx"
+                codebase="https://github.com/sbhushan01/OmniSponsorBlock/releases/latest/download/OmniSponsorBlock.crx"
                 version="${{ steps.version.outputs.VERSION }}" />
             </app>
           </gupdate>
@@ -80,15 +80,3 @@ jobs:
           gh release upload "${{ github.event.release.tag_name }}" \
             OmniSponsorBlock.zip OmniSponsorBlock.crx --clobber
 
-      - name: Prepare GitHub Pages folder
-        run: |
-          mkdir gh-pages-dist
-          cp OmniSponsorBlock.crx gh-pages-dist/
-          cp updates.xml gh-pages-dist/
-
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./gh-pages-dist
-          keep_files: true
