@@ -1,6 +1,6 @@
 import { DEFAULT_SETTINGS } from "./constants.js";
 
-const clone = (value) => structuredClone(value);
+const clone = (value) => JSON.parse(JSON.stringify(value));
 
 export const getSettings = () =>
   new Promise((resolve) => {
