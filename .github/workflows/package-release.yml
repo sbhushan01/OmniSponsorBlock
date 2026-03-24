@@ -86,6 +86,9 @@ jobs:
   build-firefox:
     name: Build Firefox (.xpi)
     runs-on: ubuntu-latest
+    env:
+      AMO_API_KEY: ${{ secrets.AMO_API_KEY }}
+      AMO_API_SECRET: ${{ secrets.AMO_API_SECRET }}
     steps:
       - name: Checkout release tag
         uses: actions/checkout@v5
@@ -147,10 +150,10 @@ jobs:
       # Generate them at: https://addons.mozilla.org/developers/addon/api/key/
       - name: Sign .xpi via AMO (if credentials are present)
         id: amo_sign
-        if: ${{ secrets.AMO_API_KEY != '' && secrets.AMO_API_SECRET != '' }}
+        if: ${{ env.AMO_API_KEY != '' && env.AMO_API_SECRET != '' }}
         env:
-          AMO_API_KEY: ${{ secrets.AMO_API_KEY }}
-          AMO_API_SECRET: ${{ secrets.AMO_API_SECRET }}
+          AMO_API_KEY: ${{ env.AMO_API_KEY }}
+          AMO_API_SECRET: ${{ env.AMO_API_SECRET }}
         run: |
           web-ext sign \
             --source-dir dist/ \
