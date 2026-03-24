@@ -40,7 +40,9 @@ const cacheGet = (key) => {
 };
 
 const cacheSet = (key, data) => {
-  cache.set(key, { data, insertedAt: Date.now() });
+  // Clone defensively so that any later mutation of the original reference
+  // (e.g. in fetchSegments or the message handler) cannot corrupt cached data.
+  cache.set(key, { data: structuredClone(data), insertedAt: Date.now() });
 };
 
 /**
