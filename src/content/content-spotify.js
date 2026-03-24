@@ -22,6 +22,15 @@ window.addEventListener("message", async (event) => {
   if (!event.data.episodeId || event.data.episodeId === currentEpisodeId) return;
 
   currentEpisodeId = event.data.episodeId;
+
+  // --- Stale-segment guard ------------------------------------------------
+  // Clear synchronously *before* the await so the `timeupdate` listener
+  // cannot fire with the previous episode's timestamps while the network
+  // request is in flight.  The array will be repopulated once the fetch
+  // resolves; if it fails or returns empty, `timeupdate` simply becomes a
+  // no-op until the next episode loads.
+  currentSegments = [];
+
   currentSegments = await fetchSegments(currentEpisodeId);
 });
 
