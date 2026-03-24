@@ -31,7 +31,17 @@ window.addEventListener("message", async (event) => {
   // no-op until the next episode loads.
   currentSegments = [];
 
-  currentSegments = await fetchSegments(currentEpisodeId);
+  // Snapshot the ID we are fetching for.  Rapid track skipping can fire
+  // multiple concurrent fetchSegments() calls; the first to resolve must
+  // not overwrite a later episode's data if it arrives out of order.
+  const requestedEpisodeId = currentEpisodeId;
+  const segments = await fetchSegments(requestedEpisodeId);
+
+  // Only commit the result if the user hasn't already moved to a different
+  // episode while the network request was in flight.
+  if (currentEpisodeId === requestedEpisodeId) {
+    currentSegments = segments;
+  }
 });
 
 const injectMainWorldHook = () => {

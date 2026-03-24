@@ -61,6 +61,11 @@ const boot = async () => {
 
   const segments = await loadSegments(videoId);
 
+  // If another `boot` execution resolved its own fetch and already set up a
+  // binding while this one was awaiting the network, discard this stale
+  // result rather than overwriting the live binding and leaking a listener.
+  if (currentBinding !== null) return;
+
   // Bail out if a newer `boot` call has already taken over or the player was
   // swapped while we were waiting.
   if (
