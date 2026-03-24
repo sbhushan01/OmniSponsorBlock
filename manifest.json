@@ -30,7 +30,6 @@
     "https://*.youtube.com/*",
     "https://www.youtubekids.com/*",
     "https://sponsor.ajay.app/*",
-    "https://open.spotify.com/*",
     "https://*.spotify.com/*",
     "https://www.youtube-nocookie.com/embed/*"
   ],
@@ -139,7 +138,6 @@
         "shared.css"
       ],
       "matches": [
-        "https://open.spotify.com/*",
         "https://*.spotify.com/*"
       ],
       "all_frames": true,
