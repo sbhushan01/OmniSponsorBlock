@@ -1,0 +1,49 @@
+{
+  "manifest_version": 2,
+  "name": "OmniSponsorBlock",
+  "version": "0.1.0",
+  "description": "Skip SponsorBlock segments on YouTube and Spotify podcasts.",
+  "icons": {
+    "48": "icons/IconSponsorBlocker64px.png",
+    "96": "icons/IconSponsorBlocker128px.png"
+  },
+  "permissions": [
+    "storage",
+    "webRequest",
+    "alarms",
+    "tabs",
+    "https://*.youtube.com/*",
+    "https://www.youtubekids.com/*",
+    "https://sponsor.ajay.app/*",
+    "https://googleusercontent.com/*",
+    "https://open.spotify.com/*"
+  ],
+  "background": {
+    "scripts": ["js/background.js"],
+    "persistent": false
+  },
+  "browser_action": {
+    "default_title": "OmniSponsorBlock",
+    "default_popup": "popup.html"
+  },
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": true
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://*.youtube.com/*", "https://www.youtubekids.com/*"],
+      "js": ["js/content-youtube.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "https://open.spotify.com/*",
+        "https://googleusercontent.com/*"
+      ],
+      "js": ["js/content-spotify.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": ["js/spotify-inject.js", "styles/ui.css"]
+}

@@ -60,6 +60,27 @@ npm run build:opera     # Opera (Manifest V2)
 
 The built extension will be in the `dist/` folder. Load it via **Load unpacked** as described above.
 
+### Firefox MV2 source workflow
+
+This repository also includes a focused Firefox MV2 source pipeline:
+
+```bash
+npm install --ignore-scripts
+cp config.json.example config.json   # optional; overrides API server address
+npm run build:firefox
+```
+
+Artifacts are generated in `dist/` using:
+
+- `manifest.firefox.v2.json` -> `dist/manifest.json`
+- `src/background/index.js` -> `dist/js/background.js`
+- `src/content/content-youtube.js` -> `dist/js/content-youtube.js`
+- `src/content/content-spotify.js` -> `dist/js/content-spotify.js`
+- `src/content/spotify-inject.js` -> `dist/js/spotify-inject.js`
+- `public/*` static UI files -> `dist/*`
+
+If `config.json` exists, it is copied to `dist/config.json`; otherwise `config.json.example` is used as fallback.
+
 ### Development Build (with source maps)
 
 ```bash
