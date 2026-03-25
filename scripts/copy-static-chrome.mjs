@@ -24,6 +24,7 @@ const copyRecursive = (from, to) => {
 
 copyRecursive(publicDir, distDir);
 copyRecursive(path.join(root, "icons"), path.join(distDir, "icons"));
+copyRecursive(path.join(root, "_locales"), path.join(distDir, "_locales"));
 
 // Use the MV3 manifest for Chrome (manifest.json)
 fs.copyFileSync(
