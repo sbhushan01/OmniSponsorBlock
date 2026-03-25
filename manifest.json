@@ -23,7 +23,7 @@
     "tabs"
   ],
   "options_ui": {
-    "page": "options/options.html",
+    "page": "options.html",
     "open_in_tab": true
   },
   "host_permissions": [
@@ -111,7 +111,7 @@
     {
       "world": "ISOLATED",
       "js": [
-        "./js/content.js"
+        "./js/content-youtube.js"
       ],
       "css": [
         "content.css",
