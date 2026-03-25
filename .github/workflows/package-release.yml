@@ -27,10 +27,22 @@ jobs:
           VERSION="${VERSION#v}"
           echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
 
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Build Chrome extension
+        run: node scripts/copy-static-chrome.mjs
+
       - name: Update version in manifest.json
         run: |
-          jq --arg v "${{ steps.version.outputs.VERSION }}" '.version = $v' manifest.json > manifest.tmp.json
-          mv manifest.tmp.json manifest.json
+          jq --arg v "${{ steps.version.outputs.VERSION }}" '.version = $v' dist/manifest.json > dist/manifest.tmp.json
+          mv dist/manifest.tmp.json dist/manifest.json
 
       - name: Restore signing key
         run: echo "${{ secrets.CRX_PRIVATE_KEY }}" | base64 --decode > key.pem
@@ -39,24 +51,16 @@ jobs:
         run: npm install -g crx3
 
       - name: Pack extension as .crx
-        run: crx3 pack . --key key.pem --crx OmniSponsorBlock.crx
+        run: crx3 pack dist/ --key key.pem --crx OmniSponsorBlock.crx
 
       - name: Wipe key from disk
         run: rm -f key.pem
 
       - name: Package extension as .zip
         run: |
-          zip -r OmniSponsorBlock.zip . \
-            --exclude "*.git*" \
-            --exclude ".github/*" \
-            --exclude "*.md" \
-            --exclude "*.zip" \
-            --exclude "*.crx" \
-            --exclude "updates.xml" \
-            --exclude "key.pem" \
-            --exclude "src/*" \
-            --exclude "scripts/*" \
-            --exclude "node_modules/*"
+          cd dist
+          zip -r ../OmniSponsorBlock.zip .
+          cd ..
 
       - name: Update updates.xml
         run: |
@@ -74,7 +78,8 @@ jobs:
       - name: Save Chrome assets
         run: |
           mkdir -p /tmp/osb-chrome
-          cp manifest.json updates.xml OmniSponsorBlock.crx OmniSponsorBlock.zip /tmp/osb-chrome/
+          cp dist/manifest.json /tmp/osb-chrome/
+          cp updates.xml OmniSponsorBlock.crx OmniSponsorBlock.zip /tmp/osb-chrome/
 
       - name: Upload Chrome assets
         uses: actions/upload-artifact@v4
@@ -218,9 +223,14 @@ jobs:
           cp /tmp/osb-chrome/manifest.json .
           cp /tmp/osb-chrome/updates.xml .
           cp /tmp/osb-firefox/updates.json .
+          
+          # Also bump the Firefox specific manifest so source stays in sync
+          jq --arg v "${{ github.ref_name }}" '.version = ($v | sub("^v";""))' manifest.firefox.v2.json > manifest.firefox.tmp.json
+          mv manifest.firefox.tmp.json manifest.firefox.v2.json
+
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add manifest.json updates.xml updates.json
+          git add manifest.json manifest.firefox.v2.json updates.xml updates.json
           git diff --cached --quiet || git commit -m "chore: bump version to $(jq -r .version manifest.json)"
           # We add "|| true" so that if you have branch protection turned on, 
           # a push failure won't crash the workflow before the release step
