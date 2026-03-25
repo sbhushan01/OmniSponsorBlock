@@ -32,6 +32,9 @@ fs.copyFileSync(
   path.join(distDir, "manifest.json")
 );
 
+// Copy pre-built JS bundles
+copyRecursive(path.join(root, "js"), path.join(distDir, "js"));
+
 fs.copyFileSync(
   path.join(root, "src/content/spotify-inject.js"),
   path.join(distDir, "js/spotify-inject.js")

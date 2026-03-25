@@ -24,6 +24,7 @@ const copyRecursive = (from, to) => {
 
 copyRecursive(publicDir, distDir);
 copyRecursive(path.join(root, "icons"), path.join(distDir, "icons"));
+copyRecursive(path.join(root, "_locales"), path.join(distDir, "_locales"));
 fs.copyFileSync(
   path.join(root, "manifest.firefox.v2.json"),
   path.join(distDir, "manifest.json")
