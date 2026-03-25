@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout release tag
-        uses: actions/checkout@v5
+        uses: actions/checkout@v4
         with:
           ref: ${{ github.ref_name }}
           submodules: recursive
@@ -92,7 +92,7 @@ jobs:
       AMO_API_SECRET: ${{ secrets.AMO_API_SECRET }}
     steps:
       - name: Checkout release tag
-        uses: actions/checkout@v5
+        uses: actions/checkout@v4
         with:
           ref: ${{ github.ref_name }}
           submodules: recursive
@@ -105,7 +105,7 @@ jobs:
           echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Set up Node.js
-        uses: actions/setup-node@v5
+        uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
@@ -143,7 +143,7 @@ jobs:
 
       - name: Sign .xpi via AMO (if credentials are present)
         id: amo_sign
-        if: ${{ env.AMO_API_KEY != '' && env.AMO_API_SECRET != '' }}
+        if: env.AMO_API_KEY != '' && env.AMO_API_SECRET != ''
         run: |
           web-ext sign \
             --source-dir dist/ \
@@ -197,7 +197,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout default branch
-        uses: actions/checkout@v5
+        uses: actions/checkout@v4
         with:
           ref: ${{ github.event.repository.default_branch }}
 
@@ -234,17 +234,3 @@ jobs:
             /tmp/osb-chrome/OmniSponsorBlock.zip \
             /tmp/osb-chrome/OmniSponsorBlock.crx \
             /tmp/osb-firefox/OmniSponsorBlock.xpi
-```
-
----
-
-**Result — every time you push a `v*` tag:**
-```
-GitHub Release
-├── OmniSponsorBlock.crx     ← Chrome
-├── OmniSponsorBlock.zip     ← Chrome (sideload/manual)
-└── OmniSponsorBlock.xpi     ← Firefox
-
-GitHub Pages (gh-pages branch / root)
-├── updates.xml              ← Chrome auto-update pointer
-└── updates.json             ← Firefox auto-update pointer
