@@ -50,9 +50,8 @@ jobs:
       - name: Install crx3
         run: npm install -g crx3
 
-      # === THIS IS THE LINE THAT IS FIXED! ===
       - name: Pack extension as .crx
-        run: crx3 --key key.pem --crx OmniSponsorBlock.crx dist/
+        run: crx3 pack dist/ --key key.pem --output OmniSponsorBlock.crx
 
       - name: Wipe key from disk
         run: rm -f key.pem
@@ -242,7 +241,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           # 1. Check if release exists; if not, create it
-          gh release view "${{ github.ref_name }}" || gh release create "${{ github.ref_name }}" --title "${{ github.ref_name }}" --generate-notes
+          gh release view "${{ github.ref_name }}" || gh release create "${{ github.ref_name }}" --title "${{ github.ref_name }}" --target "${{ github.ref_name }}" --generate-notes
           
           # 2. Upload the built assets (overwriting if they already exist)
           gh release upload "${{ github.ref_name }}" --clobber \
