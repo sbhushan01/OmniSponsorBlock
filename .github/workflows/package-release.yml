@@ -50,8 +50,9 @@ jobs:
       - name: Install crx3
         run: npm install -g crx3
 
+      # === THIS IS THE LINE THAT IS FIXED! ===
       - name: Pack extension as .crx
-        run: crx3 pack dist/ --key key.pem --crx OmniSponsorBlock.crx
+        run: crx3 --key key.pem --crx OmniSponsorBlock.crx dist/
 
       - name: Wipe key from disk
         run: rm -f key.pem
