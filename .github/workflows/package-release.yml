@@ -52,8 +52,13 @@ jobs:
 
       - name: Pack extension as .crx
         run: |
-          crx3 dist/ --privateKey key.pem --crxFile OmniSponsorBlock.crx
-          if [ ! -f OmniSponsorBlock.crx ]; then echo "CRX generation failed"; exit 1; fi
+          crx3 dist/ --privateKey key.pem --crxFile OmniSponsorBlock.crx || true
+          # crx3 may output as dist.crx — find and rename if needed
+          if [ ! -f OmniSponsorBlock.crx ]; then
+            CRX=$(find . -maxdepth 2 -name "*.crx" | head -1)
+            [ -n "$CRX" ] && mv "$CRX" OmniSponsorBlock.crx
+          fi
+          [ -f OmniSponsorBlock.crx ] || { echo "CRX generation failed"; exit 1; }
 
       - name: Wipe key from disk
         run: rm -f key.pem
@@ -141,6 +146,7 @@ jobs:
 
       - name: Sign .xpi via AMO
         id: amo_sign
+        continue-on-error: true
         if: env.AMO_API_KEY != '' && env.AMO_API_SECRET != ''
         run: |
           web-ext sign \
