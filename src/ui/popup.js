@@ -3,21 +3,34 @@ import { CATEGORY_KEYS, CATEGORY_LABELS } from "../shared/constants.js";
 const getSettingsContainer = () => document.getElementById("settings");
 
 const render = (settings, container) => {
-  container.innerHTML = "";
+  // Safe way to clear the container content
+  container.replaceChildren();
 
   ["youtube", "spotify"].forEach((platform) => {
     const section = document.createElement("section");
-    section.innerHTML = `<h3>${platform.toUpperCase()}</h3>`;
+    
+    // Create header element safely using textContent
+    const title = document.createElement("h3");
+    title.textContent = platform.toUpperCase();
+    section.appendChild(title);
 
     CATEGORY_KEYS.forEach((category) => {
       const row = document.createElement("label");
       row.className = "row";
-      row.innerHTML = `
-        <input type="checkbox" data-platform="${platform}" data-category="${category}" ${
-        settings[platform][category] ? "checked" : ""
-      }>
-        <span>${CATEGORY_LABELS[category]}</span>
-      `;
+
+      // Safely build the checkbox input using properties
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.dataset.platform = platform;
+      checkbox.dataset.category = category;
+      checkbox.checked = !!settings[platform]?.[category];
+
+      // Safely set the text label
+      const labelText = document.createElement("span");
+      labelText.textContent = CATEGORY_LABELS[category];
+
+      row.appendChild(checkbox);
+      row.appendChild(labelText);
       section.appendChild(row);
     });
 
