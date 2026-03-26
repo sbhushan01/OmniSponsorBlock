@@ -125,14 +125,13 @@ jobs:
 
       - name: Fix and Stamp Firefox Manifest
         run: |
-          # Force inject missing requirements: default_locale and data_collection_permissions
           jq --arg v "${{ steps.version.outputs.VERSION }}" '
             .version = $v |
             .default_locale = "en" |
+            .data_collection_permissions = {"required": [], "optional": []} |
             .browser_specific_settings.gecko += {
               "id": "omnisponsorblock@sbhushan01.github.io",
-              "strict_min_version": "109.0",
-              "data_collection_permissions": false
+              "strict_min_version": "109.0"
             }
           ' dist/manifest.json > dist/manifest.tmp.json
           mv dist/manifest.tmp.json dist/manifest.json
@@ -149,7 +148,7 @@ jobs:
             --artifacts-dir /tmp/osb-firefox/ \
             --api-key  "$AMO_API_KEY" \
             --api-secret "$AMO_API_SECRET" \
-            --channel listed
+            --channel unlisted
           SIGNED=$(ls /tmp/osb-firefox/*.xpi | head -1)
           mv "$SIGNED" /tmp/osb-firefox/OmniSponsorBlock.xpi
           echo "signed=true" >> $GITHUB_OUTPUT
