@@ -30,7 +30,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'npm'
 
       - name: Install dependencies
@@ -51,7 +51,9 @@ jobs:
         run: npm install -g crx3
 
       - name: Pack extension as .crx
-        run: crx3 dist/ --privateKey key.pem --crxFile OmniSponsorBlock.crx
+        run: |
+          crx3 dist/ --privateKey key.pem --crxFile OmniSponsorBlock.crx
+          if [ ! -f OmniSponsorBlock.crx ]; then echo "CRX generation failed"; exit 1; fi
 
       - name: Wipe key from disk
         run: rm -f key.pem
@@ -112,7 +114,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'npm'
 
       - name: Install dependencies
@@ -121,32 +123,24 @@ jobs:
       - name: Build Firefox MV2 extension
         run: npm run build:firefox
 
-      - name: Stamp version into Firefox manifest
+      - name: Fix and Stamp Firefox Manifest
         run: |
-          jq --arg v "${{ steps.version.outputs.VERSION }}" '.version = $v' dist/manifest.json \
-            > dist/manifest.tmp.json
-          mv dist/manifest.tmp.json dist/manifest.json
-
-      - name: Inject gecko browser_specific_settings (if absent)
-        run: |
-          jq '
-            if .browser_specific_settings then .
-            else . + {
-              "browser_specific_settings": {
-                "gecko": {
-                  "id": "omnisponsorblock@sbhushan01.github.io",
-                  "strict_min_version": "109.0"
-                }
-              }
+          # Force inject missing requirements: default_locale and data_collection_permissions
+          jq --arg v "${{ steps.version.outputs.VERSION }}" '
+            .version = $v |
+            .default_locale = "en" |
+            .browser_specific_settings.gecko += {
+              "id": "omnisponsorblock@sbhushan01.github.io",
+              "strict_min_version": "109.0",
+              "data_collection_permissions": false
             }
-            end
           ' dist/manifest.json > dist/manifest.tmp.json
           mv dist/manifest.tmp.json dist/manifest.json
 
       - name: Install web-ext
         run: npm install -g web-ext
 
-      - name: Sign .xpi via AMO (if credentials are present)
+      - name: Sign .xpi via AMO
         id: amo_sign
         if: env.AMO_API_KEY != '' && env.AMO_API_SECRET != ''
         run: |
@@ -195,7 +189,7 @@ jobs:
           path: /tmp/osb-firefox/
           retention-days: 1
 
-  # ── 3. Publish release + commit update manifests ──────────────────────────
+  # ── 3. Publish release ────────────────────────────────────────────────────
   publish:
     name: Publish Release Assets
     needs: [build-chrome, build-firefox]
@@ -218,13 +212,12 @@ jobs:
           name: firefox-assets
           path: /tmp/osb-firefox/
 
-      - name: Commit update manifests to default branch
+      - name: Commit update manifests
         run: |
           cp /tmp/osb-chrome/manifest.json .
           cp /tmp/osb-chrome/updates.xml .
           cp /tmp/osb-firefox/updates.json .
           
-          # Also bump the Firefox specific manifest so source stays in sync
           jq --arg v "${{ github.ref_name }}" '.version = ($v | sub("^v";""))' manifest.firefox.v2.json > manifest.firefox.tmp.json
           mv manifest.firefox.tmp.json manifest.firefox.v2.json
 
@@ -232,18 +225,13 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add manifest.json manifest.firefox.v2.json updates.xml updates.json
           git diff --cached --quiet || git commit -m "chore: bump version to $(jq -r .version manifest.json)"
-          # We add "|| true" so that if you have branch protection turned on, 
-          # a push failure won't crash the workflow before the release step
-          git push origin "HEAD:refs/heads/${{ github.event.repository.default_branch }}" || echo "Push failed (likely branch protection). Continuing to release upload..."
+          git push origin "HEAD:refs/heads/${{ github.event.repository.default_branch }}" || echo "Push failed. Continuing to release..."
 
-      - name: Create or Update GitHub Release with all assets
+      - name: Create or Update GitHub Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # 1. Check if release exists; if not, create it
           gh release view "${{ github.ref_name }}" || gh release create "${{ github.ref_name }}" --title "${{ github.ref_name }}" --target "${{ github.ref_name }}" --generate-notes
-          
-          # 2. Upload the built assets (overwriting if they already exist)
           gh release upload "${{ github.ref_name }}" --clobber \
             /tmp/osb-chrome/OmniSponsorBlock.zip \
             /tmp/osb-chrome/OmniSponsorBlock.crx \
