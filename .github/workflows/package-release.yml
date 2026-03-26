@@ -51,7 +51,7 @@ jobs:
         run: npm install -g crx3
 
       - name: Pack extension as .crx
-        run: crx3 pack dist/ --key key.pem --output OmniSponsorBlock.crx
+        run: crx3 dist/ --privateKey key.pem --crxFile OmniSponsorBlock.crx
 
       - name: Wipe key from disk
         run: rm -f key.pem
