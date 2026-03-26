@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "OmniSponsorBlock",
-  "version": "1.0.21", 
+  "version": "1.0.21",
   "default_locale": "en",
   "description": "Skip SponsorBlock segments on YouTube and Spotify podcasts.",
   "icons": {
@@ -62,8 +62,11 @@
   "browser_specific_settings": {
     "gecko": {
       "id": "omnisponsorblock@sbhushan01.github.io",
-      "strict_min_version": "109.0",
-      "data_collection_permissions": false
+      "strict_min_version": "109.0"
     }
+  },
+  "data_collection_permissions": {
+    "required": [],
+    "optional": []
   }
 }
