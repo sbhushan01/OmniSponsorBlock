@@ -125,14 +125,19 @@ jobs:
 
       - name: Fix and Stamp Firefox Manifest
         run: |
-          # Force inject missing requirements: default_locale and data_collection_permissions
+          # Force inject missing requirements properly and add update_url
           jq --arg v "${{ steps.version.outputs.VERSION }}" '
             .version = $v |
             .default_locale = "en" |
+            del(.browser_specific_settings.gecko.data_collection_permissions) |
             .browser_specific_settings.gecko += {
               "id": "omnisponsorblock@sbhushan01.github.io",
               "strict_min_version": "109.0",
-              "data_collection_permissions": false
+              "update_url": "https://sbhushan01.github.io/OmniSponsorBlock/updates.json"
+            } |
+            .data_collection_permissions = {
+              "required": [],
+              "optional": []
             }
           ' dist/manifest.json > dist/manifest.tmp.json
           mv dist/manifest.tmp.json dist/manifest.json
