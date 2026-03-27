@@ -18,7 +18,7 @@ OmniSponsorBlock combines [SponsorBlock](https://github.com/ajayyy/SponsorBlock)
 - **Shared popup**: One extension icon, one settings panel for both platforms
 - **Category control**: Enable or disable specific segment types independently per platform
 - **Mobile support**: Works on YouTube mobile web and Spotify mobile web layouts
-- **All SponsorBlock segment types supported**: sponsor, self-promo, exclusive access, interaction, intro, outro, preview, hook, filler, chapter, music off-topic, highlight
+- **Supported segment types**: sponsor, self-promo, interaction, intro, outro, preview, filler, music off-topic
 
 ---
 
@@ -51,18 +51,15 @@ npm install --ignore-scripts
 cp config.json.example config.json
 
 # Build
-npm run build           # Chrome (Manifest V3)
 npm run build:firefox   # Firefox (Manifest V2)
-npm run build:edge      # Edge (Manifest V3)
-npm run build:safari    # Safari (Manifest V2)
-npm run build:opera     # Opera (Manifest V2)
+npm run build:chrome    # Chrome / Edge (Manifest V3)
 ```
 
 The built extension will be in the `dist/` folder. Load it via **Load unpacked** as described above.
 
 ### Firefox MV2 source workflow
 
-This repository also includes a focused Firefox MV2 source pipeline:
+This repository includes a focused Firefox MV2 source pipeline:
 
 ```bash
 npm install --ignore-scripts
@@ -74,7 +71,7 @@ Artifacts are generated in `dist/` using:
 
 - `manifest.firefox.v2.json` -> `dist/manifest.json`
 - `src/background/index.js` -> `dist/js/background.js`
-- `src/content/content-youtube.js` -> `dist/js/content-youtube.js`
+- `src/content/content-youtube.js` -> `dist/js/content.js`
 - `src/content/content-spotify.js` -> `dist/js/content-spotify.js`
 - `src/content/spotify-inject.js` -> `dist/js/spotify-inject.js`
 - `public/*` static UI files -> `dist/*`
@@ -127,20 +124,14 @@ OmniSponsorBlock uses three content scripts, routing by domain at runtime:
 manifest.json
 ├── content.js          → youtube.com only   (YouTube skip logic)
 ├── content-spotify.js  → open.spotify.com   (Spotify skip logic)
-└── document.js         → both domains       (MAIN world, platform-detected at runtime)
+└── spotify-inject.js   → injected into page context to intercept episode data
 
 background.js           → shared service worker (API requests, storage, messaging)
 ```
 
-Platform-specific Spotify code lives in `src/platforms/spotify/`:
+The Spotify content script (`content-spotify.js`) listens for episode ID messages posted by `spotify-inject.js`, which runs in the page's main world and intercepts `fetch`/`XHR` responses to extract the current episode ID.
 
-- `video.ts` — audio/video element management and episode data
-- `pageUtils.ts` — DOM utilities for Spotify's player controls
-- `skipProfiles.ts` — skip profile logic adapted for Spotify
-- `skipRule.ts` — segment skip rule evaluation for Spotify
-- `scriptInjector.ts` — injects into Spotify's page context to intercept episode data
-
-The YouTube side is unchanged from upstream SponsorBlock and uses the `maze-utils` submodule for shared utilities.
+The YouTube content script binds to the `<video>` element and checks the current playback time against segments fetched from the SponsorBlock API on every `timeupdate` and `seeked` event.
 
 ---
 
@@ -154,12 +145,8 @@ The YouTube side is unchanged from upstream SponsorBlock and uses the `maze-util
 | Intro | Intro animation / channel branding | Skip |
 | Outro | Endcards and credits | Skip |
 | Preview | Recap of previous content | Skip |
-| Hook | Teaser before the intro | Skip |
 | Filler | Tangents and jokes | Skip |
 | Music off-topic | Non-music section in a music video | Skip |
-| Exclusive access | Paid membership / sponsor product placement | Full video label |
-| Highlight (POI) | Best moment in the video | Point of interest |
-| Chapter | Chapter markers | Chapter display |
 
 ---
 
