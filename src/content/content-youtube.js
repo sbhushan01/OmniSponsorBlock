@@ -4,9 +4,9 @@ import { findActiveSegment } from "../shared/time.js";
  * Extract the YouTube video ID from the current URL.
  *
  * Handles three URL shapes:
- *   - Standard watch:  https://www.youtube.com/watch?v=VIDEO_ID
- *   - Shorts:          https://www.youtube.com/shorts/VIDEO_ID
- *   - Embedded player: https://www.youtube-nocookie.com/embed/VIDEO_ID
+ * - Standard watch:  https://www.youtube.com/watch?v=VIDEO_ID
+ * - Shorts:          https://www.youtube.com/shorts/VIDEO_ID
+ * - Embedded player: https://www.youtube-nocookie.com/embed/VIDEO_ID
  */
 const getVideoId = () => {
   const url = new URL(window.location.href);
@@ -23,6 +23,7 @@ const getVideoId = () => {
 };
 
 let currentBinding = null;
+let fetchingVideoId = null; // Prevent concurrent network fetches for the same video
 
 const loadSegments = (videoId) =>
   new Promise((resolve) => {
@@ -42,6 +43,9 @@ const boot = async () => {
 
   // Prevent duplicate handlers when neither the player nor the video changed.
   if (currentBinding?.player === player && currentBinding.videoId === videoId) return;
+  
+  // Guard against concurrent boots while network request is pending
+  if (fetchingVideoId === videoId) return;
 
   // Tear down any previous binding before the async gap so a fast
   // second navigation can't leave two timeupdate listeners alive.
@@ -53,13 +57,18 @@ const boot = async () => {
   // --- SPA race-condition guard -------------------------------------------
   // Snapshot the identity we are loading for.  If the user navigates again
   // before the network round-trip finishes, `boot` will already have cleared
-  // `currentBinding` above and set it to `null`.  We check after the await
-  // that the URL hasn't moved on without us; if it has, we discard the stale
-  // result rather than binding segments for the wrong video.
+  // `currentBinding` above and set it to `null`.
   const bootVideoId = videoId;
   const bootPlayer  = player;
 
+  // Lock this video ID to prevent duplicate fetch calls
+  fetchingVideoId = videoId;
   const segments = await loadSegments(videoId);
+  
+  // Clear the lock if we are still processing this exact video request
+  if (fetchingVideoId === videoId) {
+    fetchingVideoId = null;
+  }
 
   // If another `boot` execution resolved its own fetch and already set up a
   // binding while this one was awaiting the network, discard this stale
@@ -78,6 +87,10 @@ const boot = async () => {
   if (!Array.isArray(segments) || segments.length === 0) return;
 
   const onTimeUpdate = () => {
+    // Check if an ad is playing to prevent skipping ad content
+    const isAdPlaying = player.closest('.ad-showing') !== null;
+    if (isAdPlaying) return;
+
     const active = findActiveSegment(player.currentTime, segments);
     if (active) {
       player.currentTime = active.segment[1];
