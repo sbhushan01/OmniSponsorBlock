@@ -25,6 +25,7 @@ const copyRecursive = (from, to) => {
 copyRecursive(publicDir, distDir);
 copyRecursive(path.join(root, "icons"), path.join(distDir, "icons"));
 copyRecursive(path.join(root, "_locales"), path.join(distDir, "_locales"));
+copyRecursive(path.join(root, "js"), path.join(distDir, "js"));
 
 // MISSING: Copy root CSS/HTML files
 const rootFiles = ["content.css", "shared.css", "popup.css", "popup.html"];
