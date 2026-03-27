@@ -53,7 +53,12 @@ const evictCache = async () => {
   // Pass 2: LRU eviction if still over the size limit
   if (cacheEntries.length > CACHE_MAX_SIZE) {
     cacheEntries.sort((a, b) => a.insertedAt - b.insertedAt);
-    const keysToRemove = cacheEntries.slice(0, CACHE_EVICT_COUNT).map(e => e.key);
+    
+    // Calculate how many items are over the limit to ensure we drop below max
+    const excess = cacheEntries.length - CACHE_MAX_SIZE;
+    const itemsToRemove = Math.max(CACHE_EVICT_COUNT, excess);
+    
+    const keysToRemove = cacheEntries.slice(0, itemsToRemove).map(e => e.key);
     await chrome.storage.local.remove(keysToRemove);
   }
 };
@@ -100,6 +105,12 @@ const fetchSegments = async ({ videoId, service, platform }) => {
 
   const response = await fetch(`${config.serverAddress}/api/skipSegments?${params.toString()}`);
   if (!response.ok) {
+    if (response.status === 404) {
+      // 404 simply means no segments exist for this video.
+      // Cache the empty result so we don't spam the API on navigation.
+      await cacheSet(key, []);
+      return [];
+    }
     throw new Error(`SponsorBlock API error (${response.status})`);
   }
 
