@@ -2,74 +2,59 @@ import { API_BASE_URL, CATEGORY_KEYS } from "../shared/constants.js";
 import { getSettings, setSettings } from "../shared/storage.js";
 
 // ---------------------------------------------------------------------------
-// Cache with TTL metadata
-//
-// Each entry is stored as { data, insertedAt } so we can evict old records
-// without nuking recently-fetched segments.
-//
-// Eviction policy (triggered by the "cacheCleanup" alarm every 30 minutes):
-//   1. Remove every entry whose age exceeds CACHE_TTL_MS regardless of size.
-//   2. If the cache is still larger than CACHE_MAX_SIZE after TTL eviction,
-//      remove the oldest entries (by insertion time) until it fits within
-//      CACHE_MAX_SIZE - CACHE_EVICT_COUNT, giving headroom before the next
-//      alarm fires.
+// Cache with TTL metadata (Backed by chrome.storage.local for MV3)
 // ---------------------------------------------------------------------------
 
-const CACHE_MAX_SIZE   = 500;  // Start evicting when size exceeds this
-const CACHE_EVICT_COUNT = 75;  // How many oldest entries to drop in one pass
-const CACHE_TTL_MS = 60 * 60 * 1000; // 1 hour – segments rarely change
-
-const cache = new Map(); // key → { data: any, insertedAt: number }
-let runtimeConfig = null;
-
-const cacheKey = (videoId, service) => `${service}:${videoId}`;
+const CACHE_MAX_SIZE = 500;
+const CACHE_EVICT_COUNT = 75;
+const CACHE_TTL_MS = 60 * 60 * 1000;
+const CACHE_PREFIX = "sb_cache_";
 
 // ---------------------------------------------------------------------------
 // Cache helpers
 // ---------------------------------------------------------------------------
 
-const cacheGet = (key) => {
-  const entry = cache.get(key);
+const cacheGet = async (key) => {
+  const fullKey = CACHE_PREFIX + key;
+  const result = await chrome.storage.local.get(fullKey);
+  const entry = result[fullKey];
+  
   if (!entry) return undefined;
-  // Treat stale entries as cache misses; remove lazily.
+  
   if (Date.now() - entry.insertedAt > CACHE_TTL_MS) {
-    cache.delete(key);
+    await chrome.storage.local.remove(fullKey);
     return undefined;
   }
   return entry.data;
 };
 
-const cacheSet = (key, data) => {
-  // Clone defensively so that any later mutation of the original reference
-  // (e.g. in fetchSegments or the message handler) cannot corrupt cached data.
-  cache.set(key, { data: structuredClone(data), insertedAt: Date.now() });
+const cacheSet = async (key, data) => {
+  const fullKey = CACHE_PREFIX + key;
+  await chrome.storage.local.set({
+    [fullKey]: { data, insertedAt: Date.now() }
+  });
 };
 
-/**
- * Evict expired entries, then – if the cache is still oversized – remove the
- * oldest CACHE_EVICT_COUNT entries by insertion timestamp.
- */
-const evictCache = () => {
+const evictCache = async () => {
+  const allData = await chrome.storage.local.get(null);
   const now = Date.now();
+  const cacheEntries = [];
 
-  // Pass 1: TTL eviction
-  for (const [key, entry] of cache) {
-    if (now - entry.insertedAt > CACHE_TTL_MS) {
-      cache.delete(key);
+  for (const [key, entry] of Object.entries(allData)) {
+    if (key.startsWith(CACHE_PREFIX)) {
+      if (now - entry.insertedAt > CACHE_TTL_MS) {
+        await chrome.storage.local.remove(key);
+      } else {
+        cacheEntries.push({ key, insertedAt: entry.insertedAt });
+      }
     }
   }
 
   // Pass 2: LRU eviction if still over the size limit
-  if (cache.size > CACHE_MAX_SIZE) {
-    // Sort ascending by insertion time (oldest first)
-    const sortedKeys = [...cache.entries()]
-      .sort((a, b) => a[1].insertedAt - b[1].insertedAt)
-      .map(([key]) => key);
-
-    const toRemove = sortedKeys.slice(0, CACHE_EVICT_COUNT);
-    for (const key of toRemove) {
-      cache.delete(key);
-    }
+  if (cacheEntries.length > CACHE_MAX_SIZE) {
+    cacheEntries.sort((a, b) => a.insertedAt - b.insertedAt);
+    const keysToRemove = cacheEntries.slice(0, CACHE_EVICT_COUNT).map(e => e.key);
+    await chrome.storage.local.remove(keysToRemove);
   }
 };
 
@@ -78,18 +63,16 @@ const evictCache = () => {
 // ---------------------------------------------------------------------------
 
 const getRuntimeConfig = async () => {
-  if (runtimeConfig) return runtimeConfig;
   try {
     const response = await fetch(chrome.runtime.getURL("config.json"));
     if (!response.ok) throw new Error("Missing config");
     const parsed = await response.json();
-    runtimeConfig = {
+    return {
       serverAddress: parsed.serverAddress || API_BASE_URL
     };
   } catch (_error) {
-    runtimeConfig = { serverAddress: API_BASE_URL };
+    return { serverAddress: API_BASE_URL };
   }
-  return runtimeConfig;
 };
 
 // ---------------------------------------------------------------------------
@@ -97,14 +80,17 @@ const getRuntimeConfig = async () => {
 // ---------------------------------------------------------------------------
 
 const fetchSegments = async ({ videoId, service, platform }) => {
-  const key = cacheKey(videoId, service);
-
-  const cached = cacheGet(key);
-  if (cached !== undefined) return cached;
-
   const settings = await getSettings();
   const config = await getRuntimeConfig();
-  const enabledCategories = CATEGORY_KEYS.filter((cat) => settings[platform]?.[cat]);
+  
+  // Sort categories so the cache key is deterministic regardless of order
+  const enabledCategories = CATEGORY_KEYS.filter((cat) => settings[platform]?.[cat]).sort();
+  
+  // Include categories in cache key so settings changes fetch new segment subsets
+  const key = `${service}:${videoId}:${enabledCategories.join(',')}`;
+
+  const cached = await cacheGet(key);
+  if (cached !== undefined) return cached;
 
   const params = new URLSearchParams({
     videoID: videoId,
@@ -118,7 +104,7 @@ const fetchSegments = async ({ videoId, service, platform }) => {
   }
 
   const payload = await response.json();
-  cacheSet(key, payload);
+  await cacheSet(key, payload);
   return payload;
 };
 
@@ -129,6 +115,9 @@ const fetchSegments = async ({ videoId, service, platform }) => {
 chrome.runtime.onInstalled.addListener(async () => {
   const settings = await getSettings();
   await setSettings(settings);
+  
+  // Create alarm here to avoid recreating it every time the SW wakes up
+  chrome.alarms.create("cacheCleanup", { periodInMinutes: 30 });
 });
 
 chrome.alarms.onAlarm.addListener((alarm) => {
@@ -136,8 +125,6 @@ chrome.alarms.onAlarm.addListener((alarm) => {
     evictCache();
   }
 });
-
-chrome.alarms.create("cacheCleanup", { periodInMinutes: 30 });
 
 // ---------------------------------------------------------------------------
 // Message handling
@@ -148,7 +135,7 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     fetchSegments(message.payload)
       .then((segments) => sendResponse({ ok: true, data: segments }))
       .catch((error) => sendResponse({ ok: false, error: String(error) }));
-    return true;
+    return true; // Keep message channel open for async
   }
 
   if (message.type === "GET_SETTINGS") {
