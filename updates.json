@@ -1,0 +1,12 @@
+{
+  "addons": {
+    "YOUR_FIREFOX_ADDON_ID_HERE": {
+      "updates": [
+        {
+          "version": "1.0.20",
+          "update_link": "https://github.com/sbhushan01/OmniSponsorBlock/releases/latest/download/OmniSponsorBlock.xpi"
+        }
+      ]
+    }
+  }
+}
