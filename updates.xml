@@ -3,6 +3,6 @@
   <app appid="igkgdedndffdoljpojoaedjioopnpneb">
     <updatecheck
       codebase="https://github.com/sbhushan01/OmniSponsorBlock/releases/latest/download/OmniSponsorBlock.crx"
-      version="1.0.25" />
+      version="1.0.26" />
   </app>
 </gupdate>
