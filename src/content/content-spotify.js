@@ -22,28 +22,18 @@ window.addEventListener("message", async (event) => {
   if (!event.data.episodeId || event.data.episodeId === currentEpisodeId) return;
 
   currentEpisodeId = event.data.episodeId;
-
-  // --- Stale-segment guard ------------------------------------------------
-  // Clear synchronously *before* the await so the `timeupdate` listener
-  // cannot fire with the previous episode's timestamps while the network
-  // request is in flight.  The array will be repopulated once the fetch
-  // resolves; if it fails or returns empty, `timeupdate` simply becomes a
-  // no-op until the next episode loads.
   currentSegments = [];
+  
+  // Call startSkipping here! The audio element is much more likely to exist now.
+  startSkipping(); 
 
-  // Snapshot the ID we are fetching for.  Rapid track skipping can fire
-  // multiple concurrent fetchSegments() calls; the first to resolve must
-  // not overwrite a later episode's data if it arrives out of order.
   const requestedEpisodeId = currentEpisodeId;
   const segments = await fetchSegments(requestedEpisodeId);
 
-  // Only commit the result if the user hasn't already moved to a different
-  // episode while the network request was in flight.
   if (currentEpisodeId === requestedEpisodeId) {
     currentSegments = segments;
   }
 });
-
 const injectMainWorldHook = () => {
   const script = document.createElement("script");
   script.src = chrome.runtime.getURL("js/spotify-inject.js");
@@ -51,9 +41,16 @@ const injectMainWorldHook = () => {
   (document.documentElement || document.head).appendChild(script);
 };
 
-const startSkipping = () => {
+const startSkipping = (retryCount = 0) => {
   const media = document.querySelector("audio,video");
-  if (!media) return;
+  
+  if (!media) {
+    // If we can't find the player, try again in 500ms (up to 5 times max)
+    if (retryCount < 5) {
+      setTimeout(() => startSkipping(retryCount + 1), 500);
+    }
+    return;
+  }
 
   // Rebind only when the media element changes.
   if (currentMedia === media && currentMediaListener) return;
@@ -75,6 +72,6 @@ const startSkipping = () => {
 };
 
 injectMainWorldHook();
-document.addEventListener("DOMContentLoaded", startSkipping);
-window.addEventListener("spotify-navigate", startSkipping);
-window.addEventListener("popstate", startSkipping);
+document.addEventListener("DOMContentLoaded", () => startSkipping());
+window.addEventListener("spotify-navigate", () => startSkipping());
+window.addEventListener("popstate", () => startSkipping());
