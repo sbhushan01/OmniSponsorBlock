@@ -23,9 +23,9 @@ window.addEventListener("message", async (event) => {
 
   currentEpisodeId = event.data.episodeId;
   currentSegments = [];
-  
-  // Call startSkipping here! The audio element is much more likely to exist now.
-  startSkipping(); 
+
+  // Pass the episode ID so retries can bail if the episode changes mid-retry.
+  startSkipping(currentEpisodeId);
 
   const requestedEpisodeId = currentEpisodeId;
   const segments = await fetchSegments(requestedEpisodeId);
@@ -34,6 +34,7 @@ window.addEventListener("message", async (event) => {
     currentSegments = segments;
   }
 });
+
 const injectMainWorldHook = () => {
   const script = document.createElement("script");
   script.src = chrome.runtime.getURL("js/spotify-inject.js");
@@ -41,13 +42,16 @@ const injectMainWorldHook = () => {
   (document.documentElement || document.head).appendChild(script);
 };
 
-const startSkipping = (retryCount = 0) => {
+// Bug fix: accept episodeId so stale retry chains abort when the episode changes.
+const startSkipping = (episodeId, retryCount = 0) => {
+  // Bail out if the user has already navigated to a different episode.
+  if (episodeId !== currentEpisodeId) return;
+
   const media = document.querySelector("audio,video");
-  
+
   if (!media) {
-    // If we can't find the player, try again in 500ms (up to 5 times max)
     if (retryCount < 5) {
-      setTimeout(() => startSkipping(retryCount + 1), 500);
+      setTimeout(() => startSkipping(episodeId, retryCount + 1), 500);
     }
     return;
   }
@@ -72,6 +76,10 @@ const startSkipping = (retryCount = 0) => {
 };
 
 injectMainWorldHook();
-document.addEventListener("DOMContentLoaded", () => startSkipping());
-window.addEventListener("spotify-navigate", () => startSkipping());
-window.addEventListener("popstate", () => startSkipping());
+// Initial bind on page load (no episode yet, so pass null — will be a no-op
+// until the first OMNI_SPOTIFY_EPISODE message arrives and sets currentEpisodeId).
+document.addEventListener("DOMContentLoaded", () => startSkipping(currentEpisodeId));
+// Bug fix: removed the dead `spotify-navigate` listener — nothing ever dispatches
+// that event. SPA navigation is already handled by the OMNI_SPOTIFY_EPISODE
+// message flow (inject script intercepts fetch/XHR) and popstate below.
+window.addEventListener("popstate", () => startSkipping(currentEpisodeId));
