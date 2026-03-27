@@ -18,13 +18,20 @@ const cacheGet = async (key) => {
   const fullKey = CACHE_PREFIX + key;
   const result = await chrome.storage.local.get(fullKey);
   const entry = result[fullKey];
-  
+
   if (!entry) return undefined;
-  
+
   if (Date.now() - entry.insertedAt > CACHE_TTL_MS) {
     await chrome.storage.local.remove(fullKey);
     return undefined;
   }
+
+  // Bug fix: refresh insertedAt on every read so eviction is truly LRU
+  // (least-recently-used) rather than LRI (least-recently-inserted).
+  await chrome.storage.local.set({
+    [fullKey]: { data: entry.data, insertedAt: Date.now() }
+  });
+
   return entry.data;
 };
 
@@ -53,11 +60,11 @@ const evictCache = async () => {
   // Pass 2: LRU eviction if still over the size limit
   if (cacheEntries.length > CACHE_MAX_SIZE) {
     cacheEntries.sort((a, b) => a.insertedAt - b.insertedAt);
-    
+
     // Calculate how many items are over the limit to ensure we drop below max
     const excess = cacheEntries.length - CACHE_MAX_SIZE;
     const itemsToRemove = Math.max(CACHE_EVICT_COUNT, excess);
-    
+
     const keysToRemove = cacheEntries.slice(0, itemsToRemove).map(e => e.key);
     await chrome.storage.local.remove(keysToRemove);
   }
@@ -87,10 +94,10 @@ const getRuntimeConfig = async () => {
 const fetchSegments = async ({ videoId, service, platform }) => {
   const settings = await getSettings();
   const config = await getRuntimeConfig();
-  
+
   // Sort categories so the cache key is deterministic regardless of order
   const enabledCategories = CATEGORY_KEYS.filter((cat) => settings[platform]?.[cat]).sort();
-  
+
   // Include categories in cache key so settings changes fetch new segment subsets
   const key = `${service}:${videoId}:${enabledCategories.join(',')}`;
 
@@ -126,7 +133,7 @@ const fetchSegments = async ({ videoId, service, platform }) => {
 chrome.runtime.onInstalled.addListener(async () => {
   const settings = await getSettings();
   await setSettings(settings);
-  
+
   // Create alarm here to avoid recreating it every time the SW wakes up
   chrome.alarms.create("cacheCleanup", { periodInMinutes: 30 });
 });
