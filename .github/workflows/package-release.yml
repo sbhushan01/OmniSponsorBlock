@@ -149,7 +149,7 @@ jobs:
             --artifacts-dir /tmp/osb-firefox/ \
             --api-key  "$AMO_API_KEY" \
             --api-secret "$AMO_API_SECRET" \
-            --channel listed
+            --channel unlisted
           SIGNED=$(ls /tmp/osb-firefox/*.xpi | head -1)
           mv "$SIGNED" /tmp/osb-firefox/OmniSponsorBlock.xpi
           echo "signed=true" >> $GITHUB_OUTPUT
