@@ -23,7 +23,6 @@ const getVideoId = () => {
 };
 
 let currentBinding = null;
-let fetchingVideoId = null; // Prevent concurrent network fetches for the same video
 
 const loadSegments = (videoId) =>
   new Promise((resolve) => {
@@ -43,9 +42,6 @@ const boot = async () => {
 
   // Prevent duplicate handlers when neither the player nor the video changed.
   if (currentBinding?.player === player && currentBinding.videoId === videoId) return;
-  
-  // Guard against concurrent boots while network request is pending
-  if (fetchingVideoId === videoId) return;
 
   // Tear down any previous binding before the async gap so a fast
   // second navigation can't leave two timeupdate listeners alive.
@@ -61,14 +57,7 @@ const boot = async () => {
   const bootVideoId = videoId;
   const bootPlayer  = player;
 
-  // Lock this video ID to prevent duplicate fetch calls
-  fetchingVideoId = videoId;
   const segments = await loadSegments(videoId);
-  
-  // Clear the lock if we are still processing this exact video request
-  if (fetchingVideoId === videoId) {
-    fetchingVideoId = null;
-  }
 
   // If another `boot` execution resolved its own fetch and already set up a
   // binding while this one was awaiting the network, discard this stale
