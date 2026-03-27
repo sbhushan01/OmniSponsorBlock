@@ -62,7 +62,8 @@
   "browser_specific_settings": {
     "gecko": {
       "id": "omnisponsorblock@sbhushan01.github.io",
-      "strict_min_version": "109.0"
+      "strict_min_version": "109.0",
+      "update_url": "https://sbhushan01.github.io/OmniSponsorBlock/updates.json"
     }
   },
   "data_collection_permissions": {
