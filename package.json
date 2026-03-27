@@ -5,7 +5,8 @@
   "description": "Firefox MV2 extension for SponsorBlock on YouTube and Spotify podcasts",
   "scripts": {
     "build": "npm run build:firefox",
-    "build:firefox": "node scripts/copy-static-firefox.mjs"
+    "build:firefox": "node scripts/copy-static-firefox.mjs",
+    "build:chrome": "node scripts/copy-static-chrome.mjs"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^28.0.6",

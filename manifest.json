@@ -31,7 +31,8 @@
     "https://www.youtubekids.com/*",
     "https://sponsor.ajay.app/*",
     "https://open.spotify.com/*",
-    "https://www.youtube-nocookie.com/embed/*"
+    "https://www.youtube-nocookie.com/embed/*",
+    "https://googleusercontent.com/*"
   ],
   "optional_host_permissions": [
     "*://*/*"
@@ -100,7 +101,8 @@
         "libs/6xKydSBYKcSV-LCoeQqfX1RYOo3ig4vwlxdu.woff2",
         "libs/6xKydSBYKcSV-LCoeQqfX1RYOo3ig4vwmRduz8A.woff2",
         "libs/6xKydSBYKcSV-LCoeQqfX1RYOo3ig4vwmBduz8A.woff2",
-        "libs/6xKydSBYKcSV-LCoeQqfX1RYOo3ig4vwlBduz8A.woff2"
+        "libs/6xKydSBYKcSV-LCoeQqfX1RYOo3ig4vwlBduz8A.woff2",
+        "styles/ui.css"
       ],
       "matches": [
         "<all_urls>"
@@ -138,7 +140,8 @@
         "shared.css"
       ],
       "matches": [
-        "https://open.spotify.com/*"
+        "https://open.spotify.com/*",
+        "https://googleusercontent.com/*"
       ],
       "all_frames": true,
       "run_at": "document_start"
