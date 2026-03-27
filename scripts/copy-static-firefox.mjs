@@ -25,6 +25,20 @@ const copyRecursive = (from, to) => {
 copyRecursive(publicDir, distDir);
 copyRecursive(path.join(root, "icons"), path.join(distDir, "icons"));
 copyRecursive(path.join(root, "_locales"), path.join(distDir, "_locales"));
+
+// MISSING: Copy root CSS/HTML files
+const rootFiles = ["content.css", "shared.css", "popup.css", "popup.html"];
+for (const file of rootFiles) {
+  const src = path.join(root, file);
+  if (fs.existsSync(src)) fs.copyFileSync(src, path.join(distDir, file));
+}
+
+// MISSING: Copy component directories
+const rootDirs = ["options", "help", "welcome", "permissions", "libs"];
+for (const dir of rootDirs) {
+  copyRecursive(path.join(root, dir), path.join(distDir, dir));
+}
+
 fs.copyFileSync(
   path.join(root, "manifest.firefox.v2.json"),
   path.join(distDir, "manifest.json")
@@ -33,6 +47,7 @@ fs.copyFileSync(
   path.join(root, "src/content/spotify-inject.js"),
   path.join(distDir, "js/spotify-inject.js")
 );
+
 const projectConfigPath = path.join(root, "config.json");
 const fallbackConfigPath = path.join(root, "config.json.example");
 const sourceConfigPath = fs.existsSync(projectConfigPath) ? projectConfigPath : fallbackConfigPath;

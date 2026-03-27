@@ -25,15 +25,25 @@ const copyRecursive = (from, to) => {
 copyRecursive(publicDir, distDir);
 copyRecursive(path.join(root, "icons"), path.join(distDir, "icons"));
 copyRecursive(path.join(root, "_locales"), path.join(distDir, "_locales"));
+copyRecursive(path.join(root, "js"), path.join(distDir, "js"));
 
-// Use the MV3 manifest for Chrome (manifest.json)
+// MISSING: Copy root CSS/HTML files
+const rootFiles = ["content.css", "shared.css", "popup.css", "popup.html"];
+for (const file of rootFiles) {
+  const src = path.join(root, file);
+  if (fs.existsSync(src)) fs.copyFileSync(src, path.join(distDir, file));
+}
+
+// MISSING: Copy component directories
+const rootDirs = ["options", "help", "welcome", "permissions", "libs"];
+for (const dir of rootDirs) {
+  copyRecursive(path.join(root, dir), path.join(distDir, dir));
+}
+
 fs.copyFileSync(
   path.join(root, "manifest.json"),
   path.join(distDir, "manifest.json")
 );
-
-// Copy pre-built JS bundles
-copyRecursive(path.join(root, "js"), path.join(distDir, "js"));
 
 fs.copyFileSync(
   path.join(root, "src/content/spotify-inject.js"),
