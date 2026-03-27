@@ -1,6 +1,6 @@
 {
   "name": "omnisponsorblock",
-  "version": "0.1.0",
+  "version": "1.0.24",
   "private": true,
   "description": "Firefox MV2 extension for SponsorBlock on YouTube and Spotify podcasts",
   "scripts": {
