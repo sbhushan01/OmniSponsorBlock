@@ -2,11 +2,6 @@ import { findActiveSegment } from "../shared/time.js";
 
 /**
  * Extract the YouTube video ID from the current URL.
- *
- * Handles three URL shapes:
- * - Standard watch:  https://www.youtube.com/watch?v=VIDEO_ID
- * - Shorts:          https://www.youtube.com/shorts/VIDEO_ID
- * - Embedded player: https://www.youtube-nocookie.com/embed/VIDEO_ID
  */
 const getVideoId = () => {
   const url = new URL(window.location.href);
@@ -23,6 +18,7 @@ const getVideoId = () => {
 };
 
 let currentBinding = null;
+let bootCount = 0; // Use a counter to track the latest navigation safely
 
 const loadSegments = (videoId) =>
   new Promise((resolve) => {
@@ -36,46 +32,45 @@ const loadSegments = (videoId) =>
   });
 
 const boot = async () => {
-  const player = document.querySelector("video");
+  const currentBootCount = ++bootCount;
+  
+  // 1. Better player selection (YouTube often has multiple video tags)
+  const player = document.querySelector(".html5-main-video") || document.querySelector("video");
   const videoId = getVideoId();
-  if (!player || !videoId) return;
+  
+  if (!player || !videoId) {
+    // 2. Retry if the video element is not yet injected by YouTube's SPA
+    setTimeout(() => {
+      if (currentBootCount === bootCount) boot();
+    }, 500);
+    return;
+  }
 
   // Prevent duplicate handlers when neither the player nor the video changed.
   if (currentBinding?.player === player && currentBinding.videoId === videoId) return;
 
-  // Tear down any previous binding before the async gap so a fast
-  // second navigation can't leave two timeupdate listeners alive.
   if (currentBinding) {
     currentBinding.player.removeEventListener("timeupdate", currentBinding.handler);
+    currentBinding.player.removeEventListener("seeked", currentBinding.handler);
     currentBinding = null;
   }
 
-  // --- SPA race-condition guard -------------------------------------------
-  // Snapshot the identity we are loading for.  If the user navigates again
-  // before the network round-trip finishes, `boot` will already have cleared
-  // `currentBinding` above and set it to `null`.
-  const bootVideoId = videoId;
-  const bootPlayer  = player;
-
   const segments = await loadSegments(videoId);
 
-  // If another `boot` execution resolved its own fetch and already set up a
-  // binding while this one was awaiting the network, discard this stale
-  // result rather than overwriting the live binding and leaking a listener.
-  if (currentBinding !== null) return;
+  // 3. Flawed race condition check replaced with strict boot counter
+  if (currentBootCount !== bootCount) return;
 
-  // Bail out if a newer `boot` call has already taken over or the player was
-  // swapped while we were waiting.
+  // Bail out if the player was swapped while we were waiting.
   if (
-    getVideoId() !== bootVideoId ||
-    document.querySelector("video") !== bootPlayer
+    getVideoId() !== videoId ||
+    (document.querySelector(".html5-main-video") || document.querySelector("video")) !== player
   ) {
     return;
   }
 
   if (!Array.isArray(segments) || segments.length === 0) return;
 
-  const onTimeUpdate = () => {
+  const checkSegments = () => {
     // Check if an ad is playing to prevent skipping ad content
     const isAdPlaying = player.closest('.ad-showing') !== null;
     if (isAdPlaying) return;
@@ -86,15 +81,22 @@ const boot = async () => {
     }
   };
 
-  player.addEventListener("timeupdate", onTimeUpdate);
-  currentBinding = { videoId, player, handler: onTimeUpdate };
+  // 4. Use both timeupdate and seeked for more reliable skipping
+  player.addEventListener("timeupdate", checkSegments);
+  player.addEventListener("seeked", checkSegments);
+  
+  currentBinding = { videoId, player, handler: checkSegments };
 };
 
+// Also listen to yt-page-data-updated which is more reliable for YouTube SPA
 document.addEventListener("DOMContentLoaded", boot);
 window.addEventListener("yt-navigate-finish", boot);
+window.addEventListener("yt-page-data-updated", boot); 
+
 window.addEventListener("beforeunload", () => {
   if (currentBinding) {
     currentBinding.player.removeEventListener("timeupdate", currentBinding.handler);
+    currentBinding.player.removeEventListener("seeked", currentBinding.handler);
     currentBinding = null;
   }
 });
