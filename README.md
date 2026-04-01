@@ -78,15 +78,6 @@ Artifacts are generated in `dist/` using:
 
 If `config.json` exists, it is copied to `dist/config.json`; otherwise `config.json.example` is used as fallback.
 
-### Development Build (with source maps)
-
-```bash
-npm run build:dev         # One-time dev build
-npm run build:watch       # Watch mode — rebuilds on file changes
-```
-
----
-
 ## Configuration
 
 Copy `config.json.example` to `config.json` before building. The key options:
@@ -164,10 +155,9 @@ Both are licensed under LGPL-3.0. See `LICENSE`, `LICENSE-HISTORY.txt`, and `oss
 ## Contributing
 
 1. Fork the repository and create a feature branch
-2. Run `npm run build:dev` or `npm run build:watch` during development
-3. Run `npm test` before submitting
-4. Run `npm run lint` and `npm run lint:fix` to check code style
-5. Open a pull request with a clear description of what changed and why
+2. Build the extension locally with `npm run build:firefox` and/or `npm run build:chrome`
+3. Load the generated `dist/` folder as an unpacked extension and verify your changes
+4. Open a pull request with a clear description of what changed and why
 
 Bug reports and feature requests are welcome via GitHub Issues.
 
