@@ -889,6 +889,16 @@ input::-webkit-inner-spin-button {
 	height: 100%;
 	align-items: center;
 	inline-size: max-content;
+	transition: all 0.2s ease-in-out;
+}
+
+.voteButton {
+	cursor: pointer;
+	transition: transform 0.1s ease-in-out;
+}
+
+.voteButton:hover {
+	transform: scale(1.1);
 }
 
 .sponsorBlockCategoryPillTitleSection {

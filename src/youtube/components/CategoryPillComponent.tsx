@@ -54,8 +54,8 @@ class CategoryPillComponent extends React.Component<CategoryPillProps, CategoryP
                 className={"sponsorBlockCategoryPill" + (!this.props.showTextByDefault ? " sbPillNoText" : "")}
                 aria-label={this.getTitleText()}
                 onClick={(e) => this.toggleOpen(e)}
-                onMouseEnter={() => this.openTooltip()}
-                onMouseLeave={() => this.closeTooltip()}
+                onMouseEnter={!this.props.showTooltipOnClick ? () => this.openTooltip() : undefined}
+                onMouseLeave={!this.props.showTooltipOnClick ? () => this.closeTooltip() : undefined}
                 ref={this.mainRef}>
                 
                 <span className="sponsorBlockCategoryPillTitleSection">

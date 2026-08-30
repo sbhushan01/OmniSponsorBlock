@@ -6,7 +6,7 @@ import { VoteResponse } from "../messageTypes";
 import { Category, SegmentUUID, SponsorTime } from "../types";
 import { Tooltip } from "./Tooltip";
 import { waitFor } from "../utils/index";
-import { getYouTubeTitleNode } from "../utils/elements";
+import { getSpotifyTitleNode } from "../utils/elements";
 import { addCleanupListener } from "../utils/cleanup";
 
 const id = "categoryPill";
@@ -43,7 +43,7 @@ export class CategoryPill {
     private async attachToPageInternal(): Promise<void> {
         let referenceNode;
         try {
-            referenceNode = await waitFor(() => getYouTubeTitleNode());
+            referenceNode = await waitFor(() => getSpotifyTitleNode());
         } catch (e) {
             return;
         }

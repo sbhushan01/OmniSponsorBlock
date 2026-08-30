@@ -60,7 +60,8 @@ export class CategoryPill {
             if (!this.container) {
                 this.container = document.createElement('span');
                 this.container.id = id;
-                this.container.style.display = "relative";
+                this.container.style.display = "flex";
+                this.container.style.alignItems = "center";
 
                 this.root = createRoot(this.container);
                 this.ref = React.createRef();
