@@ -44,10 +44,6 @@ fs.copyFileSync(
   path.join(root, "manifest.firefox.v2.json"),
   path.join(distDir, "manifest.json")
 );
-fs.copyFileSync(
-  path.join(root, "src/content/spotify-inject.js"),
-  path.join(distDir, "js/spotify-inject.js")
-);
 
 const projectConfigPath = path.join(root, "config.json");
 const fallbackConfigPath = path.join(root, "config.json.example");

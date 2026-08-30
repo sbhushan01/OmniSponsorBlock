@@ -168,3 +168,8 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
 
   return false;
 });
+
+// Import the Spotify background logic
+import "../spotify/background.ts";
+// Import the YouTube background logic
+import "../youtube/background.ts";

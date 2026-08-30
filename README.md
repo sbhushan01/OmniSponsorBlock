@@ -23,8 +23,8 @@ Instead of juggling multiple extensions, OmniSponsorBlock delivers a seamless, s
 
 ### ✨ Key Features
 
-- **📺 YouTube Skipping**: Skip sponsors, intros, outros, interaction reminders, and filler content automatically.
-- **🎧 Spotify Skipping**: Silently jump past sponsored segments in your favorite podcasts on Spotify Web.
+- **📺 YouTube Skipping & Submitting**: Skip sponsors, intros, outros, and filler content automatically. Contribute back by submitting segments directly from the YouTube player.
+- **🎧 Spotify Skipping & Submitting**: Silently jump past sponsored segments in your favorite podcasts on Spotify Web, and submit your own segments.
 - **🎛️ Unified Control Panel**: A single popup and settings page to manage both platforms seamlessly.
 - **🎚️ Category Toggles**: Enable or disable specific skip categories independently for each platform.
 - **📱 Mobile Web Support**: Full compatibility with both YouTube and Spotify mobile web layouts.
@@ -90,8 +90,8 @@ OmniSponsorBlock respects your privacy and only requests the permissions absolut
 |---|---|
 | `storage` / `unlimitedStorage` | Save user settings and cache skip segments. |
 | `scripting` | Inject content scripts natively on YouTube and Spotify. |
-| `*://*.youtube.com/*` | Intercept video playback for YouTube skipping. |
-| `*://open.spotify.com/*` | Intercept audio playback for Spotify skipping. |
+| `*://*.youtube.com/*` | Intercept video playback for YouTube skipping and UI injection. |
+| `*://open.spotify.com/*` | Intercept audio playback for Spotify skipping and UI injection. |
 | `*://sponsor.ajay.app/*` | Fetch crowdsourced skip segments from the API. |
 
 ---
@@ -115,19 +115,18 @@ Customize exactly what you want to skip. Each category can be toggled on or off:
 
 ## 🏗️ Architecture
 
-OmniSponsorBlock efficiently routes background processes via three primary content scripts:
+OmniSponsorBlock efficiently merges the official SponsorBlock and Spot-SponsorBlock codebases while keeping them isolated in the source. They are bundled together using Rollup:
 
 ```text
 manifest.json
-├── content.js          → youtube.com only (YouTube skip logic)
-├── content-spotify.js  → open.spotify.com (Spotify skip logic)
-└── spotify-inject.js   → Injected into page context (Extracts episode data)
+├── content.js          → youtube.com only (Official YouTube UI & skip logic)
+└── content-spotify.js  → open.spotify.com (Spot-SponsorBlock UI & skip logic)
 
-background.js           → Shared service worker (API requests, storage, messaging)
+background.js           → Shared service worker merging API requests, storage, and handlers for both.
 ```
 
-- **Spotify**: `content-spotify.js` listens for episode IDs posted by `spotify-inject.js`, which intercepts network requests in the main world.
-- **YouTube**: `content.js` monitors the `<video>` element's playback time against cached segments fetched from the SponsorBlock API.
+- **Spotify**: `content-spotify.js` natively injects the Spot-SponsorBlock UI and intercepts network requests directly to extract episode data.
+- **YouTube**: `content.js` injects the official SponsorBlock UI over the YouTube player, monitors playback, and allows segment submission.
 
 ---
 
