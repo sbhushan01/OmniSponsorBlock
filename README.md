@@ -27,6 +27,7 @@ Instead of juggling multiple extensions, OmniSponsorBlock delivers a seamless, s
 - **🎧 Spotify Skipping & Submitting**: Silently jump past sponsored segments in your favorite podcasts on Spotify Web, and submit your own segments.
 - **🎛️ Unified Control Panel**: A single popup and settings page to manage both platforms seamlessly.
 - **🎚️ Category Toggles**: Enable or disable specific skip categories independently for each platform.
+- **🗳️ Interactive Category Pills**: In-player category UI for YouTube and Spotify with voting and tooltip functionality to easily rate segments.
 - **📱 Mobile Web Support**: Full compatibility with both YouTube and Spotify mobile web layouts.
 
 ---
