@@ -478,12 +478,14 @@ function videoIDChange(): void {
     }
 
     // Notify the popup about the video change
-    chrome.runtime.sendMessage({
-        message: "videoChanged",
-        videoID: getVideoID(),
-        channelID: getChannelIDInfo().id,
-        channelAuthor: getChannelIDInfo().author
-    });
+    try {
+        chrome.runtime.sendMessage({
+            message: "videoChanged",
+            videoID: getVideoID(),
+            channelID: getChannelIDInfo().id,
+            channelAuthor: getChannelIDInfo().author
+        });
+    } catch (e) {}
 
     sponsorsLookup();
 
@@ -1276,19 +1278,21 @@ async function sponsorsLookup(keepOldSubmissions = true, ignoreCache = false) {
 
 function notifyPopupOfSegments(): void {
     // notify popup of segment changes
-    chrome.runtime.sendMessage({
-        message: "infoUpdated",
-        found: sponsorDataFound,
-        status: lastResponseStatus,
-        sponsorTimes: sponsorTimes.filter((segment) => getCategorySelection(segment).option !== CategorySkipOption.Disabled),
-        time: getCurrentTime() ?? 0,
-        onMobileYouTube: isOnMobileYouTube(),
-        videoID: getVideoID(),
-        loopedChapter: loopedChapter?.UUID,
-        channelID: getChannelIDInfo().id,
-        channelAuthor: getChannelIDInfo().author,
-        currentTabSkipProfileID: getSkipProfileIDForTab()
-    });
+    try {
+        chrome.runtime.sendMessage({
+            message: "infoUpdated",
+            found: sponsorDataFound,
+            status: lastResponseStatus,
+            sponsorTimes: sponsorTimes.filter((segment) => getCategorySelection(segment).option !== CategorySkipOption.Disabled),
+            time: getCurrentTime() ?? 0,
+            onMobileYouTube: isOnMobileYouTube(),
+            videoID: getVideoID(),
+            loopedChapter: loopedChapter?.UUID,
+            channelID: getChannelIDInfo().id,
+            channelAuthor: getChannelIDInfo().author,
+            currentTabSkipProfileID: getSkipProfileIDForTab()
+        });
+    } catch (e) {}
 }
 
 function importExistingChapters(wait: boolean) {
@@ -2369,13 +2373,14 @@ async function voteAsync(type: number, UUID: SegmentUUID, category?: Category): 
     }
 
     return new Promise((resolve) => {
-        chrome.runtime.sendMessage({
-            message: "submitVote",
-            type: type,
-            UUID: UUID,
-            category: category,
-            videoID: getVideoID()
-        }, (response) => {
+        try {
+            chrome.runtime.sendMessage({
+                message: "submitVote",
+                type: type,
+                UUID: UUID,
+                category: category,
+                videoID: getVideoID()
+            }, (response) => {
             if (response.ok === true) {
                 // Change the sponsor locally
                 const segment = utils.getSponsorTimeFromUUID(sponsorTimes, UUID);
@@ -2398,6 +2403,7 @@ async function voteAsync(type: number, UUID: SegmentUUID, category?: Category): 
 
             resolve(response);
         });
+        } catch (e) { resolve(null); }
     });
 }
 
@@ -2601,10 +2607,12 @@ function updateActiveSegment(currentTime: number): void {
 
     previewBar?.updateChapterText(sponsorTimes, sponsorTimesSubmitting, currentTime);
 
-    chrome.runtime.sendMessage({
-        message: "time",
-        time: currentTime
-    });
+    try {
+        chrome.runtime.sendMessage({
+            message: "time",
+            time: currentTime
+        });
+    } catch (e) {}
 }
 
 function nextChapter(): void {

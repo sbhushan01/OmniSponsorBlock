@@ -134,14 +134,15 @@ export function setupBackgroundRequestProxy() {
 export function sendRequestToCustomServer(type: string, url: string, data = {}, headers = {}): Promise<FetchResponse> {
     return new Promise((resolve, reject) => {
         // Ask the background script to do the work
-        chrome.runtime.sendMessage({
-            message: "sendRequest",
-            type,
-            url,
-            data,
-            headers
-        }, (response) => {
-            if (response == null) {
+        try {
+            chrome.runtime.sendMessage({
+                message: "sendRequest",
+                type,
+                url,
+                data,
+                headers
+            }, (response) => {
+                if (response == null) {
                 reject(new Error(`Got ${response} response from background page`));
             } else if ("error" in response) {
                 reject(response.error);
@@ -149,22 +150,26 @@ export function sendRequestToCustomServer(type: string, url: string, data = {}, 
                 resolve(response);
             }
         });
+        } catch (e) {
+            reject(e);
+        }
     });
 }
 
 export function sendBinaryRequestToCustomServer(type: string, url: string, data = {}, headers = {}): Promise<FetchResponseBinary> {
     return new Promise((resolve, reject) => {
         // Ask the background script to do the work
-        chrome.runtime.sendMessage({
-            message: "sendRequest",
-            type,
-            url,
-            data,
-            headers,
-            binary: true,
-            returnHeaders: true
-        }, (response) => {
-            if (response == null) {
+        try {
+            chrome.runtime.sendMessage({
+                message: "sendRequest",
+                type,
+                url,
+                data,
+                headers,
+                binary: true,
+                returnHeaders: true
+            }, (response) => {
+                if (response == null) {
                 reject(new Error(`Got ${response} response from background page`));
             } else if ("error" in response) {
                 reject(response.error);
@@ -172,6 +177,9 @@ export function sendBinaryRequestToCustomServer(type: string, url: string, data 
                 resolve(response);
             }
         });
+        } catch (e) {
+            reject(e);
+        }
     });
 }
 

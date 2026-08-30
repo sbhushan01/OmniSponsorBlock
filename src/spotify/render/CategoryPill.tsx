@@ -41,8 +41,12 @@ export class CategoryPill {
     }
 
     private async attachToPageInternal(): Promise<void> {
-        const referenceNode =
-            await waitFor(() => getYouTubeTitleNode());
+        let referenceNode;
+        try {
+            referenceNode = await waitFor(() => getYouTubeTitleNode());
+        } catch (e) {
+            return;
+        }
 
         if (referenceNode && !referenceNode.contains(this.container)) {
             if (!this.container) {

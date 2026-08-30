@@ -43,8 +43,12 @@ export class CategoryPill {
     }
 
     private async attachToPageInternal(): Promise<void> {
-        let referenceNode =
-            await waitFor(() => getYouTubeTitleNode());
+        let referenceNode;
+        try {
+            referenceNode = await waitFor(() => getYouTubeTitleNode());
+        } catch (e) {
+            return;
+        }
 
         // Experimental YouTube layout with description on right
         const isOnDescriptionOnRightLayout = document.querySelector("#title #description");
