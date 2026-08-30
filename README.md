@@ -1,44 +1,53 @@
-# OmniSponsorBlock
+<div align="center">
+  <img src="icons/LogoSponsorBlocker256px.png" alt="OmniSponsorBlock Logo" width="160" />
 
-**Skip sponsors and unwanted segments on YouTube videos and Spotify podcasts — in one extension.**
+  # OmniSponsorBlock
 
-![License: LGPL-3.0](https://img.shields.io/badge/License-LGPL%203.0-blue.svg)
-![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)
-![Chrome](https://img.shields.io/badge/Chrome-Manifest%20V3-yellow.svg)
-![Firefox](https://img.shields.io/badge/Firefox-Manifest%20V2-orange.svg)
+  **The unified solution to skip sponsors, self-promos, and unwanted segments on YouTube videos and Spotify podcasts.**
 
-OmniSponsorBlock combines [SponsorBlock](https://github.com/ajayyy/SponsorBlock) (YouTube) and [Spot-SponsorBlock](https://github.com/Spot-SponsorBlock/Spot-SponsorBlock-Extension) (Spotify) into a single browser extension. Instead of installing and managing two separate extensions, you get unified sponsor-skipping across both platforms with a shared configuration and popup.
+  [![License: LGPL-3.0](https://img.shields.io/badge/License-LGPL%203.0-blue.svg)](LICENSE)
+  [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
+  [![Chrome](https://img.shields.io/badge/Chrome-Manifest%20V3-yellow.svg)]()
+  [![Firefox](https://img.shields.io/badge/Firefox-Manifest%20V2-orange.svg)]()
 
----
-
-## Features
-
-- **YouTube**: Skip sponsors, self-promos, intros, outros, interaction reminders, filler content, and more — powered by the community-driven SponsorBlock database
-- **Spotify**: Skip sponsor segments in podcasts, automatically and silently
-- **Shared popup**: One extension icon, one settings panel for both platforms
-- **Category control**: Enable or disable specific segment types independently per platform
-- **Mobile support**: Works on YouTube mobile web and Spotify mobile web layouts
-- **Supported segment types**: sponsor, self-promo, interaction, intro, outro, preview, filler, music off-topic
+  *One extension. Two platforms. Zero interruptions.*
+</div>
 
 ---
 
-## Installation
+## 🌟 Overview
+
+**OmniSponsorBlock** merges the power of [SponsorBlock](https://github.com/ajayyy/SponsorBlock) (for YouTube) and [Spot-SponsorBlock](https://github.com/Spot-SponsorBlock/Spot-SponsorBlock-Extension) (for Spotify) into a **single, unified browser extension**. 
+
+Instead of juggling multiple extensions, OmniSponsorBlock delivers a seamless, shared configuration and unified popup to control your skip preferences across platforms.
+
+### ✨ Key Features
+
+- **📺 YouTube Skipping**: Skip sponsors, intros, outros, interaction reminders, and filler content automatically.
+- **🎧 Spotify Skipping**: Silently jump past sponsored segments in your favorite podcasts on Spotify Web.
+- **🎛️ Unified Control Panel**: A single popup and settings page to manage both platforms seamlessly.
+- **🎚️ Category Toggles**: Enable or disable specific skip categories independently for each platform.
+- **📱 Mobile Web Support**: Full compatibility with both YouTube and Spotify mobile web layouts.
+
+---
+
+## 🚀 Installation
 
 ### Load Pre-built Extension (Chrome / Edge)
 
-1. Download and extract `omnisponsorblock-dist.zip`
-2. Open `chrome://extensions/` (or `edge://extensions/`)
-3. Enable **Developer mode** (toggle in the top right)
-4. Click **Load unpacked** and select the extracted `dist/` folder
-5. The OmniSponsorBlock icon will appear in your toolbar
+1. Download and extract the `omnisponsorblock-dist.zip` release.
+2. Navigate to `chrome://extensions/` (or `edge://extensions/`).
+3. Toggle **Developer mode** in the top right corner.
+4. Click **Load unpacked** and select the extracted `dist/` directory.
+5. Pin the **OmniSponsorBlock** icon to your toolbar and enjoy!
 
 ### Build from Source
 
-**Requirements:** Node.js 18+, npm
+**Prerequisites:** Node.js 18+ and npm.
 
 ```bash
 # Clone the repository
-git clone https://github.com/sbhushan01/OmniSponsorBlock
+git clone https://github.com/sbhushan01/OmniSponsorBlock.git
 cd OmniSponsorBlock
 
 # Initialize submodules (maze-utils)
@@ -50,35 +59,15 @@ npm install --ignore-scripts
 # Copy and optionally edit the config
 cp config.json.example config.json
 
-# Build
-npm run build:firefox   # Firefox (Manifest V2)
-npm run build:chrome    # Chrome / Edge (Manifest V3)
+# Build the extension
+npm run build:chrome    # For Chrome/Edge (Manifest V3)
+npm run build:firefox   # For Firefox (Manifest V2)
 ```
+The built files will be output to the `dist/` directory, ready to be loaded via **Load unpacked**.
 
-The built extension will be in the `dist/` folder. Load it via **Load unpacked** as described above.
+---
 
-### Firefox MV2 source workflow
-
-This repository includes a focused Firefox MV2 source pipeline:
-
-```bash
-npm install --ignore-scripts
-cp config.json.example config.json   # optional; overrides API server address
-npm run build:firefox
-```
-
-Artifacts are generated in `dist/` using:
-
-- `manifest.firefox.v2.json` -> `dist/manifest.json`
-- `src/background/index.js` -> `dist/js/background.js`
-- `src/content/content-youtube.js` -> `dist/js/content.js`
-- `src/content/content-spotify.js` -> `dist/js/content-spotify.js`
-- `src/content/spotify-inject.js` -> `dist/js/spotify-inject.js`
-- `public/*` static UI files -> `dist/*`
-
-If `config.json` exists, it is copied to `dist/config.json`; otherwise `config.json.example` is used as fallback.
-
-## Configuration
+## ⚙️ Configuration
 
 Copy `config.json.example` to `config.json` before building. The key options:
 
@@ -89,80 +78,81 @@ Copy `config.json.example` to `config.json` before building. The key options:
 | `categoryList` | *(all categories)* | Which segment categories to fetch |
 | `categorySupport` | *(see file)* | Which skip modes each category supports |
 
-You can point `serverAddress` at a self-hosted SponsorBlock server instance if desired.
+*Note: You can configure `serverAddress` to point to a self-hosted SponsorBlock server instance.*
 
 ---
 
-## Permissions
+## 🔒 Privacy & Permissions
 
-The extension requests only what it needs:
+OmniSponsorBlock respects your privacy and only requests the permissions absolutely necessary to function:
 
 | Permission | Reason |
 |---|---|
-| `storage` / `unlimitedStorage` | Save your settings and segment cache |
-| `scripting` | Inject content scripts on YouTube and Spotify |
-| `https://*.youtube.com/*` | YouTube sponsor skipping |
-| `https://open.spotify.com/*` | Spotify podcast sponsor skipping |
-| `https://sponsor.ajay.app/*` | Fetch sponsor segments from the SponsorBlock API |
+| `storage` / `unlimitedStorage` | Save user settings and cache skip segments. |
+| `scripting` | Inject content scripts natively on YouTube and Spotify. |
+| `*://*.youtube.com/*` | Intercept video playback for YouTube skipping. |
+| `*://open.spotify.com/*` | Intercept audio playback for Spotify skipping. |
+| `*://sponsor.ajay.app/*` | Fetch crowdsourced skip segments from the API. |
 
 ---
 
-## Architecture
+## 🧠 Segment Categories
 
-OmniSponsorBlock uses three content scripts, routing by domain at runtime:
+Customize exactly what you want to skip. Each category can be toggled on or off:
 
-```
+| Category | Description | Default Action |
+|:---|:---|:---|
+| **Sponsor** | Paid promotions and sponsorships | ⏩ Skip |
+| **Self-promo** | Unpaid promotions by the creator | ⏩ Skip |
+| **Interaction** | "Like and Subscribe" reminders | ⏩ Skip |
+| **Intro** | Opening animations or channel branding | ⏩ Skip |
+| **Outro** | Endcards and credits | ⏩ Skip |
+| **Preview** | Recaps of previous content | ⏩ Skip |
+| **Filler** | Tangents, jokes, and off-topic banter | ⏩ Skip |
+| **Music off-topic** | Non-music sections in a music video | ⏩ Skip |
+
+---
+
+## 🏗️ Architecture
+
+OmniSponsorBlock efficiently routes background processes via three primary content scripts:
+
+```text
 manifest.json
-├── content.js          → youtube.com only   (YouTube skip logic)
-├── content-spotify.js  → open.spotify.com   (Spotify skip logic)
-└── spotify-inject.js   → injected into page context to intercept episode data
+├── content.js          → youtube.com only (YouTube skip logic)
+├── content-spotify.js  → open.spotify.com (Spotify skip logic)
+└── spotify-inject.js   → Injected into page context (Extracts episode data)
 
-background.js           → shared service worker (API requests, storage, messaging)
+background.js           → Shared service worker (API requests, storage, messaging)
 ```
 
-The Spotify content script (`content-spotify.js`) listens for episode ID messages posted by `spotify-inject.js`, which runs in the page's main world and intercepts `fetch`/`XHR` responses to extract the current episode ID.
-
-The YouTube content script binds to the `<video>` element and checks the current playback time against segments fetched from the SponsorBlock API on every `timeupdate` and `seeked` event.
-
----
-
-## Segment Categories
-
-| Category | Description | Default action |
-|---|---|---|
-| Sponsor | Paid promotion | Skip |
-| Self-promo | Unpaid promotion by the creator | Skip |
-| Interaction | Subscribe/like reminders | Skip |
-| Intro | Intro animation / channel branding | Skip |
-| Outro | Endcards and credits | Skip |
-| Preview | Recap of previous content | Skip |
-| Filler | Tangents and jokes | Skip |
-| Music off-topic | Non-music section in a music video | Skip |
+- **Spotify**: `content-spotify.js` listens for episode IDs posted by `spotify-inject.js`, which intercepts network requests in the main world.
+- **YouTube**: `content.js` monitors the `<video>` element's playback time against cached segments fetched from the SponsorBlock API.
 
 ---
 
-## Credits
+## 🤝 Credits & Acknowledgements
 
-OmniSponsorBlock is built on top of two open-source projects:
+OmniSponsorBlock stands on the shoulders of giants. This project is built upon two incredible open-source extensions:
 
-- **[SponsorBlock](https://github.com/ajayyy/SponsorBlock)** by [@ajayyy](https://github.com/ajayyy) — the YouTube sponsor-skipping extension and community database that powers this project
-- **[Spot-SponsorBlock](https://github.com/Spot-SponsorBlock/Spot-SponsorBlock-Extension)** — the Spotify podcast sponsor-skipping extension
-
-Both are licensed under LGPL-3.0. See `LICENSE`, `LICENSE-HISTORY.txt`, and `oss-attribution/attribution.txt` for full license details.
+- **[SponsorBlock](https://github.com/ajayyy/SponsorBlock)** by [@ajayyy](https://github.com/ajayyy) — the pioneering YouTube extension and community database.
+- **[Spot-SponsorBlock](https://github.com/Spot-SponsorBlock/Spot-SponsorBlock-Extension)** by [@nicholasMeadows](https://github.com/nicholasMeadows) — the Spotify podcast skip integration.
 
 ---
 
-## Contributing
+## 🛠️ Contributing
 
-1. Fork the repository and create a feature branch
-2. Build the extension locally with `npm run build:firefox` and/or `npm run build:chrome`
-3. Load the generated `dist/` folder as an unpacked extension and verify your changes
-4. Open a pull request with a clear description of what changed and why
+We welcome contributions! 
 
-Bug reports and feature requests are welcome via GitHub Issues.
+1. **Fork** the repository and create a feature branch.
+2. **Build** locally (`npm run build:firefox` or `npm run build:chrome`).
+3. **Test** by loading the `dist/` directory as an unpacked extension.
+4. **Submit a PR** with a clear description of your changes.
+
+Found a bug or have a feature idea? Open an issue on GitHub!
 
 ---
 
-## License
+## 📄 License
 
-LGPL-3.0 — see [LICENSE](LICENSE) for details.
+This project is licensed under **LGPL-3.0**. See the [LICENSE](LICENSE) file for complete details. Also refer to `LICENSE-HISTORY.txt` and `oss-attribution/attribution.txt`.
