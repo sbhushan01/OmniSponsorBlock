@@ -2,25 +2,32 @@
 
 :root {
     --color-scheme: dark;
-    --background: #333333;
-    --menu-background: #181818;
+    --background: #09090b;
+    --menu-background: rgba(24, 24, 27, 0.6);
     --menu-foreground: white;
     --dialog-background: #181818;
-    --dialog-border: white;
-    --tab-color: #242424;
-    --tab-button-hover: #4d0000;
+    --dialog-border: rgba(255, 255, 255, 0.1);
+    --tab-color: transparent;
+    --tab-button-hover: rgba(255, 255, 255, 0.1);
     --tab-hover: white;
-    --description: #dfdfdf;
+    --description: #a1a1aa;
     --disabled: #520000;
     --slider: #707070;
-    --title: #dad8d8;
-    --border-color: #484848;
+    --title: #ffffff;
+    --border-color: rgba(255, 255, 255, 0.08);
     --black: black;
     --white: white;
 
-    --selector-red: #c00000;
-    --selector-red-hover: #fc0303;
-    --tab-selected: #950000;
+    --selector-red: #e11d48;
+    --selector-red-hover: #f43f5e;
+    --tab-selected: rgba(225, 29, 72, 0.2);
+    
+    --sb-bg: #09090b;
+    --sb-glass-bg: rgba(24, 24, 27, 0.45);
+    --sb-glass-border: rgba(255, 255, 255, 0.08);
+    --sb-gradient-start: #e11d48;
+    --sb-gradient-end: #7c3aed;
+    --sb-font: "Outfit", system-ui, sans-serif;
 }
 
 [data-theme="light"] {
@@ -60,7 +67,7 @@ h1,h2,h3,h4,h5,h6 {
 
 html, body {
     color-scheme: var(--color-scheme);
-    font-family: sans-serif;
+    font-family: var(--sb-font);
     margin: 0;
     font-size: 14px;
     background-color: var(--background);
@@ -91,6 +98,9 @@ html, body {
     margin: 15px;
     z-index: 10;
     background-color: var(--menu-background);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--border-color);
     color: var(--menu-foreground);
 }
 
@@ -402,7 +412,8 @@ input[type='number'] {
 }
 
 .option-text-box {
-    width: 300px;
+    width: 100%;
+    max-width: 300px;
 }
 
 .option-button {
@@ -459,12 +470,14 @@ input[type='number'] {
 
 .switch-container {
 	content: attr(label-name);
-    width: max-content;
+    width: 100%;
+    max-width: max-content;
 
     font-size: 14px;
 
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
 }
 
 .switch-container .switch-label {
