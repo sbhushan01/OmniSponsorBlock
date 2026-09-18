@@ -68,6 +68,25 @@ The built files will be output to the `dist/` directory, ready to be loaded via 
 
 ---
 
+## 🌐 GitHub Pages
+
+This repository now includes a root `index.html` so the project URL opens correctly:
+
+- `https://sbhushan01.github.io/OmniSponsorBlock/`
+
+It also keeps the extension update manifests available at:
+
+- `https://sbhushan01.github.io/OmniSponsorBlock/updates.xml`
+- `https://sbhushan01.github.io/OmniSponsorBlock/updates.json`
+
+To ensure this is published:
+
+1. Go to **Settings → Pages**.
+2. Set **Source** to **GitHub Actions**.
+3. Ensure the **Deploy GitHub Pages** workflow succeeds on `main`.
+
+---
+
 ## ⚙️ Configuration
 
 Copy `config.json.example` to `config.json` before building. The key options:
