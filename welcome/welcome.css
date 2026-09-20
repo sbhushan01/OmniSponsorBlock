@@ -143,6 +143,7 @@ body {
   width: 36px;
   height: 36px;
   border-radius: 8px;
+  flex-shrink: 0;
 }
 
 #header-title {
@@ -562,5 +563,26 @@ body {
     flex-direction: column;
     gap: 12px;
     text-align: center;
+  }
+
+  #header-title {
+    font-size: 1.1rem;
+  }
+
+  #developer-info {
+    flex-direction: column;
+    text-align: center;
+    gap: 12px;
+  }
+
+  .credit-item {
+    flex-direction: column;
+    text-align: center;
+    gap: 12px;
+  }
+
+  .feature-pill {
+    padding: 8px 14px;
+    font-size: 0.85rem;
   }
 }

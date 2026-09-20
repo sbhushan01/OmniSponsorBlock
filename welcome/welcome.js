@@ -7,8 +7,8 @@
   const RELEASES_URL   = `https://github.com/${GITHUB_REPO}/releases/latest`;
 
   // ── Show installed version ──────────────────────────────────────────────────
-  const manifest = chrome.runtime.getManifest();
-  const currentVersion = manifest.version;
+  const manifest = (typeof chrome !== "undefined" && chrome.runtime && chrome.runtime.getManifest) ? chrome.runtime.getManifest() : null;
+  const currentVersion = manifest ? manifest.version : "1.0.28";
 
   const versionBadge = document.getElementById("version-badge");
   if (versionBadge) {
@@ -19,7 +19,11 @@
   const getStartedBtn = document.getElementById("get-started-btn");
   if (getStartedBtn) {
     getStartedBtn.addEventListener("click", function () {
-      chrome.runtime.sendMessage({ message: "openConfig" });
+      if (typeof chrome !== "undefined" && chrome.runtime && chrome.runtime.sendMessage) {
+        chrome.runtime.sendMessage({ message: "openConfig" });
+      } else {
+        alert("Configuration is only available when running as an extension.");
+      }
     });
   }
 

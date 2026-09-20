@@ -4,9 +4,10 @@
   "private": true,
   "description": "Firefox MV2 extension for SponsorBlock on YouTube and Spotify podcasts",
   "scripts": {
-    "build": "npm run build:firefox",
-    "build:firefox": "node scripts/copy-static-firefox.mjs",
-    "build:chrome": "node scripts/copy-static-chrome.mjs"
+    "build": "npm run build:firefox && npm run build:chrome",
+    "build:firefox": "node scripts/copy-static-firefox.mjs && rollup -c rollup.firefox.config.mjs",
+    "build:chrome": "node scripts/copy-static-chrome.mjs",
+    "watch": "rollup -c rollup.firefox.config.mjs -w"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^28.0.6",
