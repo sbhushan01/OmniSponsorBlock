@@ -166,7 +166,7 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     return true;
   }
 
-  return false;
+  return;
 });
 
 // Import the Spotify background logic
