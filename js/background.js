@@ -1,86 +1,2779 @@
-(()=>{"use strict";var e={3531(e,t,o){var n=this&&this.__awaiter||function(e,t,o,n){return new(o||(o=Promise))(function(i,r){function s(e){try{c(n.next(e))}catch(e){r(e)}}function a(e){try{c(n.throw(e))}catch(e){r(e)}}function c(e){var t;e.done?i(e.value):(t=e.value,t instanceof o?t:new o(function(e){e(t)})).then(s,a)}c((n=n.apply(e,t||[])).next())})};Object.defineProperty(t,"__esModule",{value:!0}),t.logRequest=t.sendBinaryRequestToCustomServer=t.sendRequestToCustomServer=t.setupBackgroundRequestProxy=t.serializeOrStringify=t.isSerializable=t.sendRealRequestToCustomServer=void 0;const i=o(1108),r=o(1740),s=o(7913),a=o(3262);function c(e,t,o={},r={}){return n(this,void 0,void 0,function*(){return"get"===e.toLowerCase()&&(t=(0,i.objectToURI)(t,o,!0),o=null),yield fetch(t,{method:e,headers:Object.assign({"Content-Type":"application/json"},r||{}),redirect:"follow",body:o?JSON.stringify(o):null})})}function l(e){try{return structuredClone(e),!0}catch(e){return!1}}function u(e){return l(e)?e:"toString"in e&&"function"==typeof e.toString?e.toString():String(e)}t.sendRealRequestToCustomServer=c,t.isSerializable=l,t.serializeOrStringify=u,t.setupBackgroundRequestProxy=function(){chrome.runtime.onMessage.addListener((e,t,o)=>"sendRequest"===e.message?(c(e.type,e.url,e.data,e.headers).then(t=>n(this,void 0,void 0,function*(){const n=e.binary?(0,i.isFirefoxOrSafari)()&&!(0,r.isSafari)()?yield t.blob():Array.from(new Uint8Array(yield t.arrayBuffer())):null;o({responseText:e.binary?"":yield t.text(),responseBinary:n,headers:e.returnHeaders&&t.headers?[...t.headers.entries()].reduce((e,[t,o])=>(e[t]=o,e),{}):null,status:t.status,ok:t.ok})})).catch(e=>{console.error("Proxied request failed:",e),o({error:u(e)})}),!0):"getHash"===e.message&&((0,a.getHash)(e.value,e.times).then(o).catch(e=>{console.error("Hash request failed:",e),o({error:u(e)})}),!0))},t.sendRequestToCustomServer=function(e,t,o={},n={}){return new Promise((i,r)=>{chrome.runtime.sendMessage({message:"sendRequest",type:e,url:t,data:o,headers:n},e=>{"error"in e?r(e.error):i(e)})})},t.sendBinaryRequestToCustomServer=function(e,t,o={},n={}){return new Promise((i,r)=>{chrome.runtime.sendMessage({message:"sendRequest",type:e,url:t,data:o,headers:n,binary:!0,returnHeaders:!0},e=>{"error"in e?r(e.error):i(e)})})},t.logRequest=function(e,t,o){const n="responseText"in e&&!(0,s.isBodyGarbage)(e.responseText)?`: ${e.responseText}`:"";console.warn(`[${t}] Server responded with code ${e.status} to a ${o} request${n}`)}},7046(e,t){Object.defineProperty(t,"__esModule",{value:!0}),t.chromeP=void 0,t.chromeP="undefined"==typeof browser?"undefined"!=typeof chrome?chrome:null:browser},2184(e,t,o){var n=this&&this.__awaiter||function(e,t,o,n){return new(o||(o=Promise))(function(i,r){function s(e){try{c(n.next(e))}catch(e){r(e)}}function a(e){try{c(n.throw(e))}catch(e){r(e)}}function c(e){var t;e.done?i(e.value):(t=e.value,t instanceof o?t:new o(function(e){e(t)})).then(s,a)}c((n=n.apply(e,t||[])).next())})};Object.defineProperty(t,"__esModule",{value:!0}),t.injectUpdatedScripts=t.getCleanupStartMessage=t.getCleanupId=t.setupCleanupListener=t.addCleanupListener=void 0;const i=o(7046),r=[];function s(){return`${chrome.runtime.id}-cleanup`}t.addCleanupListener=function(e){r.push(e)},t.setupCleanupListener=function(){const e=s(),t=performance.now();window.postMessage({source:e,message:"cleanup-start"}),window.addEventListener("message",o=>{var n;if((null===(n=o.data)||void 0===n?void 0:n.source)&&o.data.source===e&&"cleanup-start"===o.data.message&&performance.now()-t>5e3)for(const e of r)e()})},t.getCleanupId=s,t.getCleanupStartMessage=function(){return"cleanup-start"},t.injectUpdatedScripts=function(e=[],t=!1){return n(this,void 0,void 0,function*(){const o=t?e:e.concat(chrome.runtime.getManifest().content_scripts||[]);if("scripting"in chrome)for(const e of o)for(const t of yield i.chromeP.tabs.query({url:e.matches}))e.css&&e.css.length>0&&(yield i.chromeP.scripting.insertCSS({target:{tabId:t.id},files:e.css||[]})),yield i.chromeP.scripting.executeScript({target:{tabId:t.id},files:e.js||[],world:e.world||"ISOLATED"});else chrome.windows.getAll({populate:!0},e=>{var t,n;for(const i of e)if(i.tabs)for(const e of i.tabs)for(const i of o)if(e.url&&(null===(n=null===(t=i.matches)||void 0===t?void 0:t.some)||void 0===n?void 0:n.call(t,t=>e.url.match(t.replace(/\//g,"\\/").replace(/\./g,"\\.").replace(/\*/g,".*"))))){if(i.js)for(const t of i.js)chrome.tabs.executeScript(e.id,{file:t});if(i.css)for(const t of i.css)chrome.tabs.insertCSS(e.id,{file:t})}})})}},1740(e,t,o){var n=this&&this.__awaiter||function(e,t,o,n){return new(o||(o=Promise))(function(i,r){function s(e){try{c(n.next(e))}catch(e){r(e)}}function a(e){try{c(n.throw(e))}catch(e){r(e)}}function c(e){var t;e.done?i(e.value):(t=e.value,t instanceof o?t:new o(function(e){e(t)})).then(s,a)}c((n=n.apply(e,t||[])).next())})};Object.defineProperty(t,"__esModule",{value:!0}),t.keybindToString=t.formatKey=t.keybindEquals=t.isSafari=t.ProtoConfig=void 0;const i=o(1108);function r(){return"undefined"!=typeof navigator&&"Apple Computer, Inc."===navigator.vendor}function s(e){return null==e?"":" "==e?"Space":1==e.length?e.toUpperCase():e}t.ProtoConfig=class{constructor(e,t,o,n=!1){this.configLocalListeners=[],this.configSyncListeners=[],this.cachedSyncConfig=null,this.cachedLocalStorage=null,this.config=null,this.local=null,this.inDeArrow=!1,this.syncDefaults=e,this.localDefaults=t,this.inDeArrow=n,this.setupConfig(o).then(e=>{this.config=null==e?void 0:e.sync,this.local=null==e?void 0:e.local})}configProxy(){chrome.storage.onChanged.addListener((e,t)=>{if("sync"===t){for(const t in e)this.cachedSyncConfig[t]=e[t].newValue;for(const t of this.configSyncListeners)t(e)}else if("local"===t){for(const t in e)this.cachedLocalStorage[t]=e[t].newValue;for(const t of this.configLocalListeners)t(e)}});let e=0;const t=new Set;let o=null;const n=this,i={set(i,r,s){if(n.cachedSyncConfig[r]=s,Date.now()-e<100){if(t.add(r),!o){const e=()=>{const e=[...t];t.clear(),chrome.storage.sync.set(e.map(e=>[e,n.cachedSyncConfig[e]]).reduce((e,[t,o])=>(e[t]=o,e),{})),o=null};o=setTimeout(e,20)}return!0}return chrome.storage.sync.set({[r]:s}),e=Date.now(),!0},get(e,t){const o=n.cachedSyncConfig[t];return e[t]||o},deleteProperty:(e,t)=>(chrome.storage.sync.remove(t),!0)},r={set:(e,t,o)=>(n.cachedLocalStorage[t]=o,chrome.storage.local.set({[t]:o}),!0),get(e,t){const o=n.cachedLocalStorage[t];return e[t]||o},deleteProperty:(e,t)=>(chrome.storage.local.remove(t),!0)};return{sync:new Proxy({handler:i},i),local:new Proxy({handler:r},r)}}forceSyncUpdate(e){const t=this.cachedSyncConfig[e];chrome.storage.sync.set({[e]:t})}forceLocalUpdate(e){const t=this.cachedLocalStorage[e];chrome.storage.local.set({[e]:t},()=>{const t=chrome.runtime.lastError;t&&"navigationApiAvailable"!==e&&alert(`SponsorBlock/DeArrow: ${chrome.i18n.getMessage("storageFull")}\n\n${t}`)})}fetchConfig(){return n(this,void 0,void 0,function*(){yield Promise.all([new Promise(e=>{chrome.storage.sync.get(null,t=>{this.cachedSyncConfig=t,void 0===this.cachedSyncConfig&&(this.cachedSyncConfig={},(this.inDeArrow||(typeof window!=="undefined"&&window.location&&window.location.href.includes("options.html")))&&alert(`${chrome.i18n.getMessage("syncDisabledWarning")}${this.inDeArrow?`\n\n${chrome.i18n.getMessage("syncDisabledWarningDeArrow")}`:""}${(0,i.isFirefoxOrSafari)()&&!r()?`\n\n${chrome.i18n.getMessage("syncDisabledFirefoxSuggestions")}`:""}`)),e()})}),new Promise(e=>{chrome.storage.local.get(null,t=>{this.cachedLocalStorage=null!=t?t:{},e()})})])})}setupConfig(e){return n(this,void 0,void 0,function*(){if("undefined"==typeof chrome)return null;yield this.fetchConfig(),this.addDefaults();const t=this.configProxy();return e(t.sync,t.local),t})}addDefaults(){for(const e in this.syncDefaults)if(Object.prototype.hasOwnProperty.call(this.cachedSyncConfig,e)){if("barTypes"===e)for(const t in this.syncDefaults[e])Object.prototype.hasOwnProperty.call(this.cachedSyncConfig[e],t)||(this.cachedSyncConfig[e][t]=this.syncDefaults[e][t])}else this.cachedSyncConfig[e]=this.syncDefaults[e];for(const e in this.localDefaults)Object.prototype.hasOwnProperty.call(this.cachedLocalStorage,e)||(this.cachedLocalStorage[e]=this.localDefaults[e])}isReady(){return null!==this.config}},t.isSafari=r,t.keybindEquals=function(e,t){return!(null==e||null==t||Boolean(e.alt)!=Boolean(t.alt)||Boolean(e.ctrl)!=Boolean(t.ctrl)||Boolean(e.shift)!=Boolean(t.shift)||null==e.key&&null==e.code||null==t.key&&null==t.code)&&(null!=e.code&&null!=t.code?e.code===t.code:null!=e.key&&null!=t.key&&e.key.toUpperCase()===t.key.toUpperCase())},t.formatKey=s,t.keybindToString=function(e){if(null==e||null==e.key)return"";let t="";return e.ctrl&&(t+="Ctrl + "),e.alt&&(t+="Alt + "),e.shift&&(t+="Shift + "),t+s(e.key)}},4148(e,t){var o=this&&this.__awaiter||function(e,t,o,n){return new(o||(o=Promise))(function(i,r){function s(e){try{c(n.next(e))}catch(e){r(e)}}function a(e){try{c(n.throw(e))}catch(e){r(e)}}function c(e){var t;e.done?i(e.value):(t=e.value,t instanceof o?t:new o(function(e){e(t)})).then(s,a)}c((n=n.apply(e,t||[])).next())})};function n(e,t=!1){var o,n,i;if(!e)return!1;if("VIDEO"===e.tagName&&(e.classList.contains("html5-main-video")||"player"===e.id||"player_html5_api"===e.id)&&1===[...document.querySelectorAll("video")].filter(e=>e.duration).length&&e.duration)return!0;if(0===e.offsetHeight||0===e.offsetWidth&&!t)return!1;const r=null==e?void 0:e.getBoundingClientRect(),s=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2)||document.elementFromPoint(r.left,r.top);return!s&&"movie_player"===e.id&&r.top<0||!!(s===e||s&&e.contains(s)||s&&s.contains(e))||"VIDEO"===e.tagName&&(!!(null===(o=null==s?void 0:s.closest(".html5-video-player"))||void 0===o?void 0:o.contains(e))||!!(null===(i=null===(n=null==e?void 0:e.closest("#inline-preview-player"))||void 0===n?void 0:n.classList)||void 0===i?void 0:i.contains("playing-mode")))}function i(e,t=!1,o=!0){var i,r;return n(e,t)||o&&!!e&&(n(e.parentElement,t)||n(null!==(r=null===(i=e.parentElement)||void 0===i?void 0:i.parentElement)&&void 0!==r?r:null,t))}function r(e,t=!1,o=!1){return s(e,t,o)}function s(e,t=!1,o=!1,n){for(const r of e){const e=n?n(r):r;if(e&&i(e,t,o))return e}return null}function a(e,t){for(const o of e){const e=document.querySelector(o);if(e&&t(e))return e}return null}Object.defineProperty(t,"__esModule",{value:!0}),t.getElement=t.waitForElement=t.findNonEmptyElement=t.findPredicatedElement=t.findValidElement=t.findValidElementFromSelector=t.isVisibleOrParent=t.isVisible=void 0,t.isVisible=n,t.isVisibleOrParent=i,t.findValidElementFromSelector=function(e,t=!1,o=!1){return s(e,t,o,e=>document.querySelector(e))},t.findValidElement=r,t.findPredicatedElement=a,t.findNonEmptyElement=function(e){return a(e,e=>{var t,o;return(null!==(o=null===(t=e.textContent)||void 0===t?void 0:t.trim())&&void 0!==o?o:"").length>0})};let c=!1,l=null,u=[];function d(){if(!l){const e=e=>{var t;const o=[];for(const n of u){const{selector:i,visibleCheck:s,ignoreWidth:a,checkParent:c,callbacks:l}=n;let u=!0;if(e){let t=!1;for(const o of e)if("childList"===o.type&&o.addedNodes.length>0){if(o.target instanceof HTMLElement&&(o.target.matches(i)||o.target.querySelector(i))){t=!0;break}for(const e of o.addedNodes)if(e instanceof HTMLElement&&(e.matches(i)||e.querySelector(i))){t=!0;break}if(t)break}t||(u=!1)}const d=u?document.querySelectorAll(i):n.elements;if(d&&d.length>0){n.elements=d;const e=s?r(d,a,c):d[0];if(e){if(null===(t=chrome.runtime)||void 0===t?void 0:t.id)for(const t of l)t(e);o.push(i)}}}u=u.filter(e=>!o.includes(e.selector)),0===u.length&&(null==l||l.disconnect(),l=null,c=!1)};e(),u.length>0&&(l=new MutationObserver(e),l.observe(document.documentElement,{childList:!0,subtree:!0}))}}function p(e,t,o=!1,n=!1){return t?r(document.querySelectorAll(e),o,n):document.querySelector(e)}t.waitForElement=function(e,t=!1,n=!1,i=!1){return o(this,void 0,void 0,function*(){return yield new Promise(o=>{const r=p(e,t,n,i);if(r)return void o(r);const s=u.find(o=>o.selector===e&&o.visibleCheck===t);s?s.callbacks.push(o):u.push({selector:e,visibleCheck:t,ignoreWidth:n,checkParent:i,callbacks:[o]}),c||(c=!0,document.body?d():window.addEventListener("DOMContentLoaded",()=>{d()}))})})},t.getElement=p},7913(e,t){function o(e){return e.startsWith("<!DOCTYPE html>")||e.startsWith("<html>")||e.includes("cf-wrapper")}Object.defineProperty(t,"__esModule",{value:!0}),t.formatJSErrorMessage=t.getLongErrorMessage=t.isBodyGarbage=t.getShortErrorMessage=t.getFormattedTime=t.getFormattedTimeToSeconds=void 0,t.getFormattedTimeToSeconds=function(e){const t=/^(?:(?:(\d+):)?(\d+):)?(\d*(?:[.,]\d+)?)$/.exec(e);return null===t?null:3600*(t[1]?parseInt(t[1]):0)+60*(t[2]?parseInt(t[2]||"0"):0)+(t[3]?parseFloat(t[3].replace(",",".")):0)},t.getFormattedTime=function(e,t){e=Math.max(e,0);const o=Math.floor(e/60/60),n=Math.floor(e/60)%60;let i=String(n),r=e%60;t||(r=Math.floor(r));let s=String(t?r.toFixed(3):r);return r<10&&(s="0"+s),o&&n<10&&(i="0"+i),isNaN(o)||isNaN(n)?null:(o?o+":":"")+i+":"+s},t.getShortErrorMessage=function(e,t){if(0===e)return chrome.i18n.getMessage("0");const o=t&&!t.includes("cf-wrapper")&&!t.includes("<!DOCTYPE html>")&&t.length<64?` ${t}`:"";let n=chrome.i18n.getMessage(`${503===e?502:e}`);return""===n&&(n=chrome.i18n.getMessage("connectionError")),`${n} ${chrome.i18n.getMessage("errorCode").replace("{code}",`${e}${o}`)}`},t.isBodyGarbage=o,t.getLongErrorMessage=function(e,t){if(0===e)return chrome.i18n.getMessage("0");const n=t&&!o(t)?"\n\n"+t:"";let i=chrome.i18n.getMessage(`${503===e?502:e}`);return""===i&&(i=chrome.i18n.getMessage("connectionError")),`${i} ${chrome.i18n.getMessage("errorCode").replace("{code}",`${e}`)}${n}${502===e||503===e?`\n\n${chrome.i18n.getMessage("statusReminder")}`:""}`},t.formatJSErrorMessage=function(e){return`${chrome.i18n.getMessage("connectionError")} ${e}`}},3262(e,t){var o=this&&this.__awaiter||function(e,t,o,n){return new(o||(o=Promise))(function(i,r){function s(e){try{c(n.next(e))}catch(e){r(e)}}function a(e){try{c(n.throw(e))}catch(e){r(e)}}function c(e){var t;e.done?i(e.value):(t=e.value,t instanceof o?t:new o(function(e){e(t)})).then(s,a)}c((n=n.apply(e,t||[])).next())})};Object.defineProperty(t,"__esModule",{value:!0}),t.getHash=void 0,t.getHash=function(e,t=5e3){return o(this,void 0,void 0,function*(){if(t<=0)return"";if(!("subtle"in crypto))return new Promise((o,n)=>chrome.runtime.sendMessage({message:"getHash",value:e,times:t},e=>{e.error?n(e.error):o(e)}));let o=e;for(let e=0;e<t;e++){const e=yield crypto.subtle.digest("SHA-256",(new TextEncoder).encode(o).buffer);o=Array.from(new Uint8Array(e)).map(e=>e.toString(16).padStart(2,"0")).join("")}return o})}},1108(e,t){var o,n=this&&this.__awaiter||function(e,t,o,n){return new(o||(o=Promise))(function(i,r){function s(e){try{c(n.next(e))}catch(e){r(e)}}function a(e){try{c(n.throw(e))}catch(e){r(e)}}function c(e){var t;e.done?i(e.value):(t=e.value,t instanceof o?t:new o(function(e){e(t)})).then(s,a)}c((n=n.apply(e,t||[])).next())})};Object.defineProperty(t,"__esModule",{value:!0}),t.extensionUserAgent=t.isFirefoxOrSafari=t.isFirefox=t.timeoutPromise=t.PromiseTimeoutError=t.objectToURI=t.waitFor=void 0,t.waitFor=function(e,t=5e3,o=100,i){return n(this,void 0,void 0,function*(){return yield new Promise((n,r)=>{let s=null;const a=()=>{const t=e();(i?i(t):t)&&(n(t),s&&clearInterval(s))};t&&(setTimeout(()=>{clearInterval(s),r(`TIMEOUT waiting for ${null==e?void 0:e.toString()}: ${Error().stack}`)},t),s=setInterval(a,o)),a()})})},t.objectToURI=function(e,t,o){let n=0;for(const i in t){const r=e.includes("?")||n>0?"&":o?"?":"",s="string"==typeof t[i]?t[i]:JSON.stringify(t[i]);e+=r+encodeURIComponent(i)+"="+encodeURIComponent(s),n++}return e};class i extends Error{constructor(e){super("Promise timed out"),this.promise=e}}t.PromiseTimeoutError=i,t.timeoutPromise=function(e){return new Promise((t,o)=>{e&&setTimeout(()=>{o(new i)},e)})};const r="undefined"!=typeof chrome&&!!chrome.runtime.getManifest().browser_specific_settings,s="undefined"!=typeof chrome&&!!(null===(o=chrome.runtime.getManifest().browser_specific_settings)||void 0===o?void 0:o.gecko);let a;t.isFirefox=function(){return s},t.isFirefoxOrSafari=function(){return r},t.extensionUserAgent=function(){return null!=a||(a=`${chrome.runtime.id}/v${chrome.runtime.getManifest().version}`),a}},3497(e,t){function o(e){const t=e.replace(/__MSG_(\w+)__/g,function(e,t){return t?chrome.i18n.getMessage(t).replace(/</g,"&#60;").replace(/"/g,"&quot;").replace(/\n/g,"<br/>"):""});return t!=e&&t}Object.defineProperty(t,"__esModule",{value:!0}),t.getLocalizedMessage=t.localizeHtmlPage=t.generateUserID=void 0,t.generateUserID=function(e=36){const t="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";let o="";const n="undefined"==typeof window?crypto:window.crypto;if(n&&n.getRandomValues){const i=new Uint32Array(e);n.getRandomValues(i);for(let n=0;n<e;n++)o+=t[i[n]%62];return o}for(let n=0;n<e;n++)o+=t[Math.floor(62*Math.random())];return o},t.localizeHtmlPage=function(){const e=o(document.title);e&&(document.title=e);const t=document.querySelector(".sponsorBlockPageBody"),n=o(t.innerHTML.toString());n&&(t.innerHTML=n)},t.getLocalizedMessage=o},2952(e,t,o){Object.defineProperty(t,"__esModule",{value:!0}),t.setupTabUpdates=void 0;const n=o(1108);function i(e){chrome.tabs.get(e,function(t){if(chrome.runtime.lastError||!t)return;var u=t.url||"";if((u.startsWith("http://")||u.startsWith("https://"))&&!(new RegExp("^https://([^/]*\\.youtube\\.com|www\\.youtubekids\\.com|www\\.youtube-nocookie\\.com/embed|open\\.spotify\\.com)/")).test(u))return;chrome.tabs.sendMessage(e,{message:"update"},function(){chrome.runtime.lastError})})}function r(e){e.navigationApiAvailable&&(e.navigationApiAvailable.newValue?chrome.tabs.onUpdated.removeListener(i):chrome.tabs.onUpdated.addListener(i))}t.setupTabUpdates=function(e){chrome.tabs.onUpdated.addListener(i),(0,n.waitFor)(()=>null!==e.local).then(()=>{e.local.navigationApiAvailable&&chrome.tabs.onUpdated.removeListener(i)}),e.configLocalListeners.includes(r)||e.configLocalListeners.push(r)}},1398(e,t,o){var n=this&&this.__awaiter||function(e,t,o,n){return new(o||(o=Promise))(function(i,r){function s(e){try{c(n.next(e))}catch(e){r(e)}}function a(e){try{c(n.throw(e))}catch(e){r(e)}}function c(e){var t;e.done?i(e.value):(t=e.value,t instanceof o?t:new o(function(e){e(t)})).then(s,a)}c((n=n.apply(e,t||[])).next())})};Object.defineProperty(t,"__esModule",{value:!0});const i=o(8272),r=o(8856);o(5335);const s=o(3531),a=o(2952),c=o(3497),l=o(205),u=o(8249),d=o(1108),p=o(2184),f=o(5144),h=o(7046),g=o(3262),m=new l.default({registerFirefoxContentScript:S,unregisterFirefoxContentScript:w}),y={},v={};function S(e){var t,o,i,r;return n(this,void 0,void 0,function*(){if("scripting"in chrome&&"getRegisteredContentScripts"in chrome.scripting){const t=yield h.chromeP.scripting.getRegisteredContentScripts({ids:[e.id]}).catch(()=>[]);if(t&&t.length>0&&e.matches.every(e=>t[0].matches.includes(e)))return}yield w(e.id),"scripting"in chrome&&"getRegisteredContentScripts"in chrome.scripting?yield h.chromeP.scripting.registerContentScripts([{id:e.id,runAt:"document_start",matches:e.matches,allFrames:e.allFrames,js:e.js,css:e.css,persistAcrossSessions:!0}]):chrome.contentScripts.register({allFrames:e.allFrames,js:null===(o=null===(t=e.js)||void 0===t?void 0:t.map)||void 0===o?void 0:o.call(t,e=>({file:e})),css:null===(r=null===(i=e.css)||void 0===i?void 0:i.map)||void 0===r?void 0:r.call(i,e=>({file:e})),matches:e.matches}).then(t=>{v[e.id]=t})})}function w(e){return n(this,void 0,void 0,function*(){if("scripting"in chrome&&"getRegisteredContentScripts"in chrome.scripting)try{yield h.chromeP.scripting.unregisterContentScripts({ids:[e]})}catch(e){}else v[e]&&(v[e].unregister(),delete v[e])})}m.wait(()=>r.default.isReady()).then(function(){r.default.config.supportInvidious&&m.setupExtraSiteContentScripts()}),(0,s.setupBackgroundRequestProxy)(),(0,a.setupTabUpdates)(r.default),chrome.runtime.onMessage.addListener(function(e,t,o){var a;switch(e.message){case"openConfig":return chrome.tabs.create({url:chrome.runtime.getURL("options/options.html"+(e.hash?"#"+e.hash:""))}),!1;case"openHelp":return chrome.tabs.create({url:chrome.runtime.getURL("help/index.html")}),!1;case"openPage":return chrome.tabs.create({url:chrome.runtime.getURL(e.url)}),!1;case"submitVote":return function(e,t,o,a){return n(this,void 0,void 0,function*(){let l=r.default.config.userID;null!=l&&"undefined"!==l||(l=(0,c.generateUserID)(),r.default.config.userID=l);const u=void 0!==e?"&type="+e:"&category="+o;try{const e=yield function(e,t,o={}){return n(this,void 0,void 0,function*(){const n=r.default.config.testingServer?i.testingServerAddress:r.default.config.serverAddress;return yield(0,s.sendRealRequestToCustomServer)(e,n+t,o)})}("POST","/api/voteOnSponsorTime?UUID="+t+"&videoID="+a+"&userID="+l+u);return{status:e.status,ok:e.ok,responseText:yield e.text()}}catch(e){return console.error("Error while voting:",e),{error:(0,s.serializeOrStringify)(e)}}})}(e.type,e.UUID,e.category,e.videoID).then(o),!0;case"registerContentScript":return S(e),!1;case"unregisterContentScript":return w(e.id),!1;case"tabs":return chrome.tabs.query({active:!0,currentWindow:!0},t=>{if(!t||!t[0]){o(null);return}chrome.tabs.sendMessage(t[0].id,e.data,r=>{if(chrome.runtime.lastError){o(null);return}o(r)})}),!0;case"time":case"infoUpdated":case"videoChanged":if(t.tab)try{null===(a=y[t.tab.id])||void 0===a||a.postMessage(e)}catch(e){}return!1;default:return!1}}),chrome.runtime.onMessageExternal.addListener((e,t,o)=>{(0,u.getExtensionIdsToImportFrom)().includes(t.id)&&"requestConfig"===e.message&&o({userID:r.default.config.userID,allowExpirements:r.default.config.allowExpirements,showDonationLink:r.default.config.showDonationLink,showUpsells:r.default.config.showUpsells,darkMode:r.default.config.darkMode})}),chrome.runtime.onConnect.addListener(e=>{"popup"===e.name&&chrome.tabs.query({active:!0,currentWindow:!0},t=>{t&&t[0]&&(y[t[0].id]=e)})}),chrome.runtime.onInstalled.addListener(function(){setTimeout(()=>n(void 0,void 0,void 0,function*(){if(!r.default.config.userID&&!r.default.local.alreadyInstalled){chrome.tabs.create({url:chrome.runtime.getURL("/welcome/welcome.html")});const e=(0,c.generateUserID)();r.default.config.userID=e,r.default.local.alreadyInstalled=!0,r.default.config.categoryPillUpdate=!0}r.default.config.supportInvidious&&((yield m.containsInvidiousPermission())||chrome.tabs.create({url:chrome.runtime.getURL("/permissions/index.html")})),(0,g.getHash)(r.default.config.userID).then(e=>{"60eed03c8644b7efa32df06977b3a4c11b62f63518e74a0e29baa1fd449cb54f"!=e&&"e347d9878bc4c8400d2d9e1164b1f2e630b04a4ca10f1a9270969a9d53da6ebb"!=e||(r.default.config.prideTheme=!0)})}),1500),(0,d.isFirefoxOrSafari)()||((0,p.injectUpdatedScripts)().catch(f.logWarn),(0,d.waitFor)(()=>r.default.isReady()).then(()=>{r.default.config.supportInvidious&&(0,p.injectUpdatedScripts)([m.getExtraSiteRegistration()])}).catch(f.logWarn))})},8856(e,t,o){Object.defineProperty(t,"__esModule",{value:!0}),t.generateDebugDetails=void 0;const n=o(8272),i=o(5339),r=o(9209),s=o(1740),a=o(9059);class c extends s.ProtoConfig{resetToDefault(){chrome.storage.sync.set(Object.assign(Object.assign({},this.syncDefaults),{userID:this.config.userID,minutesSaved:this.config.minutesSaved,skipCount:this.config.skipCount,sponsorTimesContributed:this.config.sponsorTimesContributed})),chrome.storage.local.set(Object.assign({},this.localDefaults))}}const l=new c({userID:null,isVip:!1,permissions:{},defaultCategory:"chooseACategory",segmentListDefaultTab:r.SegmentListDefaultTab.Segments,renderSegmentsAsChapters:!1,forceChannelCheck:!1,minutesSaved:0,skipCount:0,sponsorTimesContributed:0,submissionCountSinceCategories:0,showTimeWithSkips:!0,disableSkipping:!1,muteSegments:!0,fullVideoSegments:!0,fullVideoLabelsOnThumbnails:!0,manualSkipOnFullVideo:!1,trackViewCount:!0,trackViewCountInPrivate:!0,trackDownvotes:!0,trackDownvotesInPrivate:!1,dontShowNotice:!1,showUpcomingNotice:!1,noticeVisibilityMode:r.NoticeVisibilityMode.FadedForAutoSkip,hideVideoPlayerControls:!1,hideInfoButtonPlayerControls:!1,hideDeleteButtonPlayerControls:!1,hideUploadButtonPlayerControls:!1,hideSkipButtonPlayerControls:!1,hideDiscordLaunches:0,hideDiscordLink:!1,invidiousInstances:[],supportInvidious:!1,serverAddress:n.serverAddress,minDuration:0,skipNoticeDuration:4,audioNotificationOnSkip:!1,checkForUnlistedVideos:!1,testingServer:!1,ytInfoPermissionGranted:!1,allowExpirements:!0,showDonationLink:!0,showPopupDonationCount:0,showUpsells:!0,showNewFeaturePopups:!0,donateClicked:0,autoHideInfoButton:!0,autoSkipOnMusicVideos:!1,skipNonMusicOnlyOnYoutubeMusic:!1,scrollToEditTimeUpdate:!1,categoryPillUpdate:!1,hookUpdate:!1,showChapterInfoMessage:!0,darkMode:!0,showCategoryGuidelines:!0,showCategoryWithoutPermission:!1,showSegmentNameInChapterBar:!0,showAutogeneratedChapters:!0,useVirtualTime:!0,showSegmentFailedToFetchWarning:!0,allowScrollingToEdit:!0,deArrowInstalled:!1,showDeArrowPromotion:!0,showDeArrowInSettings:!0,shownDeArrowPromotion:!1,showZoomToFillError2:!0,cleanPopup:!1,hideSegmentCreationInPopup:!1,prideTheme:!1,categoryPillColors:{},skipKeybind:{key:"Enter"},skipToHighlightKeybind:{key:"Enter",ctrl:!0},startSponsorKeybind:{key:";"},submitKeybind:{key:"'"},actuallySubmitKeybind:{key:"'",ctrl:!0},previewKeybind:{key:";",ctrl:!0},nextChapterKeybind:{key:"ArrowRight",ctrl:!0},previousChapterKeybind:{key:"ArrowLeft",ctrl:!0},closeSkipNoticeKeybind:{key:"Backspace"},downvoteKeybind:{key:"h",shift:!0},upvoteKeybind:{key:"g",shift:!0},categorySelections:[{name:"sponsor",option:r.CategorySkipOption.AutoSkip},{name:"poi_highlight",option:r.CategorySkipOption.ManualSkip},{name:"exclusive_access",option:r.CategorySkipOption.ShowOverlay},{name:"chapter",option:r.CategorySkipOption.ShowOverlay}],payments:{licenseKey:null,lastCheck:0,lastFreeCheck:0,freeAccess:!1,chaptersAllowed:!1},colorPalette:{red:"#780303",white:"#ffffff",locked:"#ffc83d"},barTypes:{"preview-chooseACategory":{color:"#ffffff",opacity:"0.7"},sponsor:{color:"#00d400",opacity:"0.7"},"preview-sponsor":{color:"#007800",opacity:"0.7"},selfpromo:{color:"#ffff00",opacity:"0.7"},"preview-selfpromo":{color:"#bfbf35",opacity:"0.7"},exclusive_access:{color:"#008a5c",opacity:"0.7"},interaction:{color:"#cc00ff",opacity:"0.7"},"preview-interaction":{color:"#6c0087",opacity:"0.7"},intro:{color:"#00ffff",opacity:"0.7"},"preview-intro":{color:"#008080",opacity:"0.7"},outro:{color:"#0202ed",opacity:"0.7"},"preview-outro":{color:"#000070",opacity:"0.7"},preview:{color:"#008fd6",opacity:"0.7"},"preview-preview":{color:"#005799",opacity:"0.7"},hook:{color:"#395699",opacity:"0.8"},"preview-hook":{color:"#273963",opacity:"0.7"},music_offtopic:{color:"#ff9900",opacity:"0.7"},"preview-music_offtopic":{color:"#a6634a",opacity:"0.7"},poi_highlight:{color:"#ff1684",opacity:"0.7"},"preview-poi_highlight":{color:"#9b044c",opacity:"0.7"},filler:{color:"#7300FF",opacity:"0.9"},"preview-filler":{color:"#2E0066",opacity:"0.7"},chapter:{color:"#ffd983",opacity:"0"}}},{downvotedSegments:{},navigationApiAvailable:null,alreadyInstalled:!1,unsubmittedSegments:{},skipRules:[],channelSkipProfileIDs:{},skipProfiles:{},skipProfileTemp:null},function(e,t){if(t.skipRules&&0!==t.skipRules.length&&t.skipRules[0].rules){const e=[];for(const o of t.skipRules){const t=o.rules;if(0!==t.length){let n=Object.assign({kind:"check"},t[0]);for(let e=1;e<t.length;e++)n={kind:"operator",operator:a.PredicateOperator.And,left:n,right:Object.assign({kind:"check"},t[e])};const i=o.comment;e.push({predicate:n,skipOption:o.skipOption,comments:0===i.length?[]:i.split(/;\s*/)})}}t.skipRules=e}if(e.whitelistedChannels){const o=e.whitelistedChannels,n="default-whitelist";t.skipProfiles[n]={name:chrome.i18n.getMessage("WhitelistedChannels"),categorySelections:e.categorySelections.filter(e=>!["exclusive_access","chapter"].includes(e.name)).map(e=>({name:e.name,option:r.CategorySkipOption.ShowOverlay})),showAutogeneratedChapters:null,autoSkipOnMusicVideos:null,skipNonMusicOnlyOnYoutubeMusic:null,muteSegments:null,fullVideoSegments:null,manualSkipOnFullVideo:null,minDuration:null},t.skipProfiles=t.skipProfiles;for(const e of o)t.channelSkipProfileIDs[e]=n;t.channelSkipProfileIDs=t.channelSkipProfileIDs,chrome.storage.sync.remove("whitelistedChannels")}if(e.changeChapterColor||(e.barTypes.chapter.color="#ffd983",e.changeChapterColor=!0,chrome.storage.sync.set({changeChapterColor:!0,barTypes:e.barTypes})),e.showZoomToFillError&&chrome.storage.sync.remove("showZoomToFillError"),e.unsubmittedSegments&&Object.keys(e.unsubmittedSegments).length>0&&chrome.storage.local.set({unsubmittedSegments:e.unsubmittedSegments},()=>{chrome.storage.sync.remove("unsubmittedSegments")}),e.chapterCategoryAdded||(e.chapterCategoryAdded=!0,e.categorySelections.some(e=>"chapter"===e.name)||(e.categorySelections.push({name:"chapter",option:r.CategorySkipOption.ShowOverlay}),e.categorySelections=e.categorySelections)),void 0!==e.exclusive_accessCategoryAdded&&chrome.storage.sync.remove("exclusive_accessCategoryAdded"),void 0!==e.fillerUpdate&&chrome.storage.sync.remove("fillerUpdate"),void 0!==e.highlightCategoryAdded&&chrome.storage.sync.remove("highlightCategoryAdded"),void 0!==e.highlightCategoryUpdate&&chrome.storage.sync.remove("highlightCategoryUpdate"),e.askAboutUnlistedVideos&&chrome.storage.sync.remove("askAboutUnlistedVideos"),!e.autoSkipOnMusicVideosUpdate){e.autoSkipOnMusicVideosUpdate=!0;for(const t of e.categorySelections)if("music_offtopic"===t.name&&t.option===r.CategorySkipOption.AutoSkip){e.autoSkipOnMusicVideos=!0;break}}if(e.disableAutoSkip)for(const t of e.categorySelections)"sponsor"===t.name&&(t.option=r.CategorySkipOption.ManualSkip,chrome.storage.sync.remove("disableAutoSkip"));"string"==typeof e.skipKeybind&&(e.skipKeybind={key:e.skipKeybind}),"string"==typeof e.startSponsorKeybind&&(e.startSponsorKeybind={key:e.startSponsorKeybind}),"string"==typeof e.submitKeybind&&(e.submitKeybind={key:e.submitKeybind});const o=["skipKeybind","startSponsorKeybind","submitKeybind"];for(let t=o.length-1;t>=0;t--)for(let n=0;n<o.length;n++)t!=n&&(0,s.keybindEquals)(e[o[t]],e[o[n]])&&(e[o[t]]=null);void 0!==e.sponsorVideoID&&chrome.storage.sync.remove("sponsorVideoID"),void 0!==e.previousVideoID&&chrome.storage.sync.remove("previousVideoID"),!e.supportInvidious&&e.invidiousInstances.length<i.length&&(e.invidiousInstances=[...new Set([...i,...e.invidiousInstances])]),e.lastIsVipUpdate&&chrome.storage.sync.remove("lastIsVipUpdate")});t.default=l,t.generateDebugDetails=function(){const e={debug:{userAgent:navigator.userAgent,platform:navigator.platform,language:navigator.language,extensionVersion:chrome.runtime.getManifest().version},config:JSON.parse(JSON.stringify(l.cachedSyncConfig))};return delete e.config.userID,e.config.serverAddress=e.config.serverAddress===n.serverAddress?"Default server address":"Custom server address",e.config.invidiousInstances=e.config.invidiousInstances.length,e.config.skipRules=e.config.skipRules.length,JSON.stringify(e,null,4)}},9209(e,t){var o,n,i,r,s,a,c;Object.defineProperty(t,"__esModule",{value:!0}),t.SegmentListDefaultTab=t.NoticeVisibilityMode=t.ChannelIDStatus=t.SponsorSourceType=t.ActionTypes=t.ActionType=t.SponsorHideType=t.CategorySkipOption=void 0,(c=t.CategorySkipOption||(t.CategorySkipOption={}))[c.FallbackToDefault=-2]="FallbackToDefault",c[c.Disabled=-1]="Disabled",c[c.ShowOverlay=0]="ShowOverlay",c[c.ManualSkip=1]="ManualSkip",c[c.AutoSkip=2]="AutoSkip",(a=t.SponsorHideType||(t.SponsorHideType={}))[a.Visible=void 0]="Visible",a[a.Downvoted=1]="Downvoted",a[a.MinimumDuration=2]="MinimumDuration",a[a.Hidden=3]="Hidden",function(e){e.Skip="skip",e.Mute="mute",e.Chapter="chapter",e.Full="full",e.Poi="poi"}(o=t.ActionType||(t.ActionType={})),t.ActionTypes=[o.Skip,o.Mute,o.Chapter,o.Full,o.Poi],(s=t.SponsorSourceType||(t.SponsorSourceType={}))[s.Server=void 0]="Server",s[s.Local=1]="Local",s[s.YouTube=2]="YouTube",s[s.Autogenerated=3]="Autogenerated",(r=t.ChannelIDStatus||(t.ChannelIDStatus={}))[r.Fetching=0]="Fetching",r[r.Found=1]="Found",r[r.Failed=2]="Failed",(i=t.NoticeVisibilityMode||(t.NoticeVisibilityMode={}))[i.FullSize=0]="FullSize",i[i.MiniForAutoSkip=1]="MiniForAutoSkip",i[i.MiniForAll=2]="MiniForAll",i[i.FadedForAutoSkip=3]="FadedForAutoSkip",i[i.FadedForAll=4]="FadedForAll",(n=t.SegmentListDefaultTab||(t.SegmentListDefaultTab={}))[n.Segments=0]="Segments",n[n.Chapters=1]="Chapters"},205(e,t,o){var n=this&&this.__awaiter||function(e,t,o,n){return new(o||(o=Promise))(function(i,r){function s(e){try{c(n.next(e))}catch(e){r(e)}}function a(e){try{c(n.throw(e))}catch(e){r(e)}}function c(e){var t;e.done?i(e.value):(t=e.value,t instanceof o?t:new o(function(e){e(t)})).then(s,a)}c((n=n.apply(e,t||[])).next())})};Object.defineProperty(t,"__esModule",{value:!0});const i=o(8856),r=o(9209),s=o(3262),a=o(1108),c=o(4148),l=o(1740),u=o(6062),d=o(3531),p=o(7913);t.default=class{constructor(e=null){this.js=["./js/content.js"],this.css=["content.css","./libs/Source+Sans+Pro.css","popup.css","shared.css"],this.backgroundScriptContainer=e}wait(e,t=5e3,o=100){return n(this,void 0,void 0,function*(){return(0,a.waitFor)(e,t,o)})}containsPermission(e){return new Promise(t=>{chrome.permissions.contains(e,t)})}setupExtraSitePermissions(e){const t=[];(0,l.isSafari)()&&t.push("webNavigation"),chrome.permissions.request({origins:this.getPermissionRegex(),permissions:t},t=>n(this,void 0,void 0,function*(){t?this.setupExtraSiteContentScripts():this.removeExtraSiteRegistration(),e(t)}))}getExtraSiteRegistration(){return{message:"registerContentScript",id:"invidious",allFrames:!0,js:this.js,css:this.css,matches:this.getPermissionRegex()}}setupExtraSiteContentScripts(){const e=this.getExtraSiteRegistration();this.backgroundScriptContainer?this.backgroundScriptContainer.registerFirefoxContentScript(e):chrome.runtime.sendMessage(e)}removeExtraSiteRegistration(){const e="invidious";this.backgroundScriptContainer?this.backgroundScriptContainer.unregisterFirefoxContentScript(e):chrome.runtime.sendMessage({message:"unregisterContentScript",id:e}),chrome.permissions.remove({origins:this.getPermissionRegex()})}applyInvidiousPermissions(e,t="supportInvidious"){return new Promise(o=>{e?this.setupExtraSitePermissions(e=>{e||(i.default.config[t]=!1),o(e)}):(this.removeExtraSiteRegistration(),o(!1))})}containsInvidiousPermission(){return new Promise(e=>{const t=[];(0,l.isSafari)()&&t.push("webNavigation"),chrome.permissions.contains({origins:this.getPermissionRegex(),permissions:t},function(t){e(t)})})}getMergedTimestamps(e){let t=[];return e.forEach(e=>{const o=t.findIndex(t=>e[0]>=t[0]&&e[0]<=t[1]),n=t.findIndex(t=>e[1]>=t[0]&&e[1]<=t[1]);if(~o&&~n){if(o===n)return;const e=t.splice(Math.max(o,n),1)[0],i=t.splice(Math.min(o,n),1)[0];t.push([Math.min(e[0],i[0]),Math.max(e[1],i[1])])}else~o?t[o][1]=e[1]:~n?t[n][0]=e[0]:t.push(e.slice());t=t.filter(t=>!(t[0]>e[0]&&t[1]<e[1]))}),t}getTimestampsDuration(e){return this.getMergedTimestamps(e).reduce((e,t)=>e+t[1]-t[0],0)}getSponsorIndexFromUUID(e,t){for(let o=0;o<e.length;o++)if(e[o].UUID&&(e[o].UUID.startsWith(t)||t.startsWith(e[o].UUID)))return o;return-1}getSponsorTimeFromUUID(e,t){return e[this.getSponsorIndexFromUUID(e,t)]}getPermissionRegex(e=[]){const t=[];0===e.length&&(e=[...i.default.config.invidiousInstances]);for(const o of e)t.push("https://*."+o+"/*"),t.push("http://*."+o+"/*");return t}findReferenceNode(){var e,t;let o=(0,c.findValidElementFromSelector)(["#player-container-id","#movie_player",".html5-video-player","#c4-player","#player-container","#main-panel.ytmusic-player-page","#player-container .video-js",".main-video-section > .video-container",".shaka-video-container","#player-container.ytk-player","#id-tv-container"]);if(null==o){const n=document.getElementById("player");if(o=null==n?void 0:n.firstChild,o){let i=1;for(;i<n.children.length&&(!(null===(e=o.classList)||void 0===e?void 0:e.contains("html5-video-player"))||!(null===(t=o.classList)||void 0===t?void 0:t.contains("ytp-embed")));)o=n.children[i],i++}}return o}isContentScript(){return"http:"===window.location.protocol||"https:"===window.location.protocol}isHex(e){return Boolean(e.match(/^[0-9a-f]+$/i))}addHiddenSegment(e,t,o){return n(this,void 0,void 0,function*(){if(chrome.extension.inIncognitoContext&&!i.default.config.trackDownvotesInPrivate||!i.default.config.trackDownvotes)return;if(t.length<60){let o;try{o=yield(0,u.asyncRequestToServer)("GET","/api/segmentID",{UUID:t,videoID:e})}catch(e){return console.error("[SB] Caught error while trying to resolve the segment UUID to be hidden",e),void alert(`${chrome.i18n.getMessage("segmentHideFailed")}\n${(0,p.formatJSErrorMessage)(e)}`)}if(!o.ok||!o.responseText)return(0,d.logRequest)(o,"SB","segment UUID resolution"),void alert(`${chrome.i18n.getMessage("segmentHideFailed")}\n${(0,p.getLongErrorMessage)(o.status,o.responseText)}`);t=o.responseText}const n=(yield(0,s.getHash)(e,1)).slice(0,4),a=yield(0,s.getHash)(t,1),c=i.default.local.downvotedSegments,l=c[n]||{segments:[],lastAccess:0};l.lastAccess=Date.now();const f=l.segments.find(e=>e.uuid===a);o===r.SponsorHideType.Visible?(l.segments.splice(l.segments.indexOf(f),1),0===l.segments.length&&delete c[n]):(f?f.hidden=o:l.segments.push({uuid:a,hidden:o}),c[n]=l);const h=Object.entries(c);if(h.length>1e4){let e=null;for(let t=0;t<h.length;t++)(null===e||h[t][1].lastAccess<e[1].lastAccess)&&(e=h[t]);delete c[e[0]]}i.default.forceLocalUpdate("downvotedSegments")})}}},8249(e,t,o){Object.defineProperty(t,"__esModule",{value:!0}),t.getExtensionIdsToImportFrom=t.isDeArrowInstalled=void 0;const n=o(8272),i=o(8856),r=o(1740),s=o(1108);function a(){return(0,r.isSafari)()?n.extensionImportList.safari:(0,s.isFirefoxOrSafari)()?n.extensionImportList.firefox:n.extensionImportList.chromium}t.isDeArrowInstalled=function(){return i.default.config.deArrowInstalled?Promise.resolve(!0):new Promise(e=>{const t=a();let o=0;for(const n of t)chrome.runtime.sendMessage(n,{message:"isInstalled"},n=>{if(chrome.runtime.lastError)return o++,void(o===t.length&&e(!1));e(n),n&&(i.default.config.deArrowInstalled=!0)})})},t.getExtensionIdsToImportFrom=a},5144(e,t){Object.defineProperty(t,"__esModule",{value:!0}),t.logWarn=t.logDebug=void 0,"undefined"!=typeof window&&(window.SBLogs={debug:[],warn:[]}),t.logDebug=function(e){"undefined"!=typeof window?window.SBLogs.debug.push(`[${(new Date).toISOString()}] ${e}`):console.log(`[${(new Date).toISOString()}] ${e}`)},t.logWarn=function(e){"undefined"!=typeof window?window.SBLogs.warn.push(`[${(new Date).toISOString()}] ${e}`):console.warn(`[${(new Date).toISOString()}] ${e}`)}},6062(e,t,o){var n=this&&this.__awaiter||function(e,t,o,n){return new(o||(o=Promise))(function(i,r){function s(e){try{c(n.next(e))}catch(e){r(e)}}function a(e){try{c(n.throw(e))}catch(e){r(e)}}function c(e){var t;e.done?i(e.value):(t=e.value,t instanceof o?t:new o(function(e){e(t)})).then(s,a)}c((n=n.apply(e,t||[])).next())})};Object.defineProperty(t,"__esModule",{value:!0}),t.asyncRequestToServer=void 0;const i=o(8856),r=o(8272),s=o(3531);t.asyncRequestToServer=function(e,t,o={},a={}){return n(this,void 0,void 0,function*(){const n=i.default.config.testingServer?r.testingServerAddress:i.default.config.serverAddress;return yield(0,s.sendRequestToCustomServer)(e,n+t,o,a)})}},9059(e,t){var o,n,i;Object.defineProperty(t,"__esModule",{value:!0}),t.PredicateOperator=t.SkipRuleOperator=t.SkipRuleAttribute=void 0,(i=t.SkipRuleAttribute||(t.SkipRuleAttribute={})).StartTimePercent="time.startPercent",i.StartTime="time.start",i.EndTimePercent="time.endPercent",i.EndTime="time.end",i.DurationPercent="time.durationPercent",i.Duration="time.duration",i.Category="category",i.ActionType="actionType",i.Description="chapter.name",i.Source="chapter.source",i.ChannelID="channel.id",i.ChannelName="channel.name",i.VideoDuration="video.duration",i.Title="video.title",(n=t.SkipRuleOperator||(t.SkipRuleOperator={})).LessOrEqual="<=",n.Less="<",n.GreaterOrEqual=">=",n.Greater=">",n.NotEqual="!=",n.Equal="==",n.NotContains="!*=",n.Contains="*=",n.NotRegex="!~=",n.Regex="~=",n.NotRegexIgnoreCase="!~i=",n.RegexIgnoreCase="~i=",(o=t.PredicateOperator||(t.PredicateOperator={})).And="and",o.Or="or"},5335(){const e=globalThis.chrome&&new function e(t){return new Proxy(t,{get(t,o){if(t[o])return"function"!=typeof t[o]?new e(t[o]):(...e)=>new Promise((n,i)=>{t[o](...e,e=>{chrome.runtime.lastError?i(new Error(chrome.runtime.lastError.message)):n(e)})})}})}(globalThis.chrome),t=/^(https?|wss?|file|ftp|\*):\/\/(\*|\*\.[^*/]+|[^*/]+)\/.*$|^file:\/\/\/.*$|^resource:\/\/(\*|\*\.[^*/]+|[^*/]+)\/.*$|^about:/,o="object"==typeof navigator&&navigator.userAgent.includes("Firefox/"),n=o?/^(https?|wss?):[/][/][^/]+([/].*)?$/:/^https?:[/][/][^/]+([/].*)?$/,i=/^(https?|file|ftp):[/]+/;function r(...e){return 0===e.length?/$./:e.includes("<all_urls>")?i:e.includes("*://*/*")?n:new RegExp(e.map(e=>function(e){if(!t.test(e))throw new Error(e+" is an invalid pattern, it must match "+String(t));let[,n,i,r]=e.split(/(^[^:]+:[/][/])([^/]+)?/);return n=n.replace("*",o?"(https?|wss?)":"https?").replace(/[/]/g,"[/]"),i=(null!=i?i:"").replace(/^[*][.]/,"([^/]+.)*").replace(/^[*]$/,"[^/]+").replace(/[.]/g,"[.]").replace(/[*]$/g,"[^.]+"),r=r.replace(/[/]/g,"[/]").replace(/[.]/g,"[.]").replace(/[*]/g,".*"),"^"+n+i+"("+r+")?$"}(e)).join("|"))}const s=Boolean(globalThis.chrome?.scripting);function a(e){return Array.isArray(e)?e:[e]}function c(e){return void 0===e?void 0:[e]}async function l({tabId:t,frameId:o,files:n,allFrames:i,matchAboutBlank:r,runAt:a},{ignoreTargetErrors:l}={}){const u=Promise.all(n.map(async n=>("string"==typeof n&&(n={file:n}),s?chrome.scripting.insertCSS({target:{tabId:t,frameIds:c(o),allFrames:void 0===o?i:void 0},files:"file"in n?[n.file]:void 0,css:"code"in n?n.code:void 0}):e.tabs.insertCSS(t,{...n,matchAboutBlank:r,allFrames:i,frameId:o,runAt:a??"document_start"}))));l?await p(u):await u}async function u({tabId:t,frameId:o,files:n,allFrames:i,matchAboutBlank:r,runAt:a},{ignoreTargetErrors:l}={}){const u=n.map(e=>"string"==typeof e?{file:e}:e);if(s){!function(e){if(e.some(e=>"code"in e))throw new Error("chrome.scripting does not support injecting strings of `code`")}(u);const e=chrome.scripting.executeScript({target:{tabId:t,frameIds:c(o),allFrames:void 0===o?i:void 0},files:u.map(({file:e})=>e)});return void(l?await p(e):await e)}const d=[];for(const n of u)"code"in n&&await d.at(-1),d.push(e.tabs.executeScript(t,{...n,matchAboutBlank:r,allFrames:i,frameId:o,runAt:a}));l?await p(Promise.all(d)):await Promise.all(d)}const d=/^No frame with id \d+ in tab \d+.$|^No tab with id: \d+.$|^The tab was closed.$|^The frame was removed.$/;async function p(e){try{await e}catch(e){if(!d.test(e?.message))throw e}}const f="object"==typeof chrome&&"webNavigation"in chrome;"object"!=typeof chrome||chrome.contentScripts||(chrome.contentScripts={register:async function(t,o){const{js:n=[],css:i=[],matchAboutBlank:s,matches:c=[],excludeMatches:d,runAt:p}=t;let{allFrames:h}=t;if(f?h=!1:h&&console.warn("`allFrames: true` requires the `webNavigation` permission to work correctly: https://github.com/fregante/content-scripts-register-polyfill#permissions"),0===c.length)throw new Error("Type error for parameter contentScriptOptions (Error processing matches: Array requires at least 1 items; you have 0) for contentScripts.register.");await Promise.all(c.map(async t=>{if(!await e.permissions.contains({origins:[t]}))throw new Error("Permission denied to register a content script for "+t)}));const g=r(...c),m=r(...null!=d?d:[]),y=async(t,o,r=0)=>{g.test(t)&&!m.test(t)&&await async function(t){return e.permissions.contains({origins:[new URL(t).origin+"/*"]})}(t)&&await async function(e,t,o={}){const n=a(e);await Promise.all(n.map(async e=>async function({frameId:e,tabId:t,allFrames:o},n,i={}){const r=a(n).flatMap(n=>[l({tabId:t,frameId:e,allFrames:o,files:n.css??[],matchAboutBlank:n.matchAboutBlank??n.match_about_blank,runAt:n.runAt??n.run_at},i),u({tabId:t,frameId:e,allFrames:o,files:n.js??[],matchAboutBlank:n.matchAboutBlank??n.match_about_blank,runAt:n.runAt??n.run_at},i)]);await Promise.all(r)}(function(e){return"object"==typeof e?{...e,allFrames:!1}:{tabId:e,frameId:void 0,allFrames:!0}}(e),t,o)))}({tabId:o,frameId:r},{css:i,js:n,matchAboutBlank:s,runAt:p},{ignoreTargetErrors:!0})},v=async(e,{status:t},{url:o})=>{"loading"===t&&o&&y(o,e)},S=async({tabId:e,frameId:t,url:o})=>{y(o,e,t)};f?chrome.webNavigation.onCommitted.addListener(S):chrome.tabs.onUpdated.addListener(v);const w={async unregister(){f?chrome.webNavigation.onCommitted.removeListener(S):chrome.tabs.onUpdated.removeListener(v)}};return"function"==typeof o&&o(w),w}})},5339(e){e.exports=JSON.parse('["www.youtubekids.com","inv.nadeko.net","inv.tux.pizza","invidious.adminforge.de","invidious.jing.rocks","invidious.nerdvpn.de","invidious.perennialte.ch","invidious.privacyredirect.com","invidious.reallyaweso.me","invidious.yourdevice.ch","iv.ggtyler.dev","iv.nboeck.de","yewtu.be"]')},8272(e){e.exports=JSON.parse('{"serverAddress":"https://sponsor.ajay.app","testingServerAddress":"https://sponsor.ajay.app/test","serverAddressComment":"This specifies the default SponsorBlock server to connect to","categoryList":["sponsor","selfpromo","exclusive_access","interaction","poi_highlight","intro","outro","preview","hook","filler","chapter","music_offtopic"],"categorySupport":{"sponsor":["skip","mute","full"],"selfpromo":["skip","mute","full"],"exclusive_access":["full"],"interaction":["skip","mute"],"intro":["skip","mute"],"outro":["skip","mute"],"preview":["skip","mute"],"hook":["skip","mute"],"filler":["skip","mute"],"music_offtopic":["skip"],"poi_highlight":["poi"],"chapter":["chapter"]},"wikiLinks":{"sponsor":"https://wiki.sponsor.ajay.app/w/Sponsor","selfpromo":"https://wiki.sponsor.ajay.app/w/Unpaid/Self_Promotion","exclusive_access":"https://wiki.sponsor.ajay.app/w/Exclusive_Access","interaction":"https://wiki.sponsor.ajay.app/w/Interaction_Reminder_(Subscribe)","intro":"https://wiki.sponsor.ajay.app/w/Intermission/Intro_Animation","outro":"https://wiki.sponsor.ajay.app/w/Endcards/Credits","preview":"https://wiki.sponsor.ajay.app/w/Preview/Recap","hook":"https://wiki.sponsor.ajay.app/w/Hook/Greetings","filler":"https://wiki.sponsor.ajay.app/w/Tangents/Jokes","music_offtopic":"https://wiki.sponsor.ajay.app/w/Music:_Non-Music_Section","poi_highlight":"https://wiki.sponsor.ajay.app/w/Highlight","guidelines":"https://wiki.sponsor.ajay.app/w/Guidelines","mute":"https://wiki.sponsor.ajay.app/w/Mute_Segment","chapter":"https://wiki.sponsor.ajay.app/w/Chapter"},"extensionImportList":{"chromium":["enamippconapkdmgfgjchkhakpfinmaj"],"firefox":["deArrow@ajay.app","deArrowBETA@ajay.app"],"safari":["app.ajay.dearrow.extension"]}}')}},t={};!function o(n){var i=t[n];if(void 0!==i)return i.exports;var r=t[n]={exports:{}};return e[n].call(r.exports,r,r.exports,o),r.exports}(1398)})();
+(function () {
+  'use strict';
 
-(function() {
-  function isExtensionContextValid() {
+  const API_BASE_URL = "https://sponsor.ajay.app";
+  const CATEGORY_KEYS = [
+    "sponsor",
+    "selfpromo",
+    "interaction",
+    "intro",
+    "outro",
+    "preview",
+    "filler",
+    "music_offtopic"
+  ];
+  const DEFAULT_SETTINGS = {
+    youtube: {
+      sponsor: true,
+      selfpromo: true,
+      interaction: true,
+      intro: true,
+      outro: true,
+      preview: true,
+      filler: true,
+      music_offtopic: true
+    },
+    spotify: {
+      sponsor: true,
+      selfpromo: true,
+      interaction: true,
+      intro: true,
+      outro: true,
+      preview: true,
+      filler: true,
+      music_offtopic: true
+    }
+  };
+
+  const clone = (value) => JSON.parse(JSON.stringify(value));
+  const getSettings = () => new Promise((resolve) => {
+    chrome.storage.local.get(["settings"], (data) => {
+      const merged = {
+        youtube: { ...DEFAULT_SETTINGS.youtube, ...data.settings?.youtube || {} },
+        spotify: { ...DEFAULT_SETTINGS.spotify, ...data.settings?.spotify || {} }
+      };
+      resolve(merged);
+    });
+  });
+  const setSettings = (settings) => new Promise((resolve) => {
+    chrome.storage.local.set({ settings: clone(settings) }, resolve);
+  });
+
+  var serverAddress = "https://sponsor.ajay.app";
+  var testingServerAddress = "https://sponsor.ajay.app/test";
+  var extensionImportList = {
+  	chromium: [
+  		"enamippconapkdmgfgjchkhakpfinmaj"
+  	],
+  	firefox: [
+  		"deArrow@ajay.app",
+  		"deArrowBETA@ajay.app"
+  	],
+  	safari: [
+  		"app.ajay.dearrow.extension"
+  	]
+  };
+
+  var CategorySkipOption$1 = /* @__PURE__ */ ((CategorySkipOption2) => {
+    CategorySkipOption2[CategorySkipOption2["FallbackToDefault"] = -2] = "FallbackToDefault";
+    CategorySkipOption2[CategorySkipOption2["Disabled"] = -1] = "Disabled";
+    CategorySkipOption2[CategorySkipOption2["ShowOverlay"] = 0] = "ShowOverlay";
+    CategorySkipOption2[CategorySkipOption2["ManualSkip"] = 1] = "ManualSkip";
+    CategorySkipOption2[CategorySkipOption2["AutoSkip"] = 2] = "AutoSkip";
+    return CategorySkipOption2;
+  })(CategorySkipOption$1 || {});
+  var NoticeVisibilityMode$1 = /* @__PURE__ */ ((NoticeVisibilityMode2) => {
+    NoticeVisibilityMode2[NoticeVisibilityMode2["FullSize"] = 0] = "FullSize";
+    NoticeVisibilityMode2[NoticeVisibilityMode2["MiniForAutoSkip"] = 1] = "MiniForAutoSkip";
+    NoticeVisibilityMode2[NoticeVisibilityMode2["MiniForAll"] = 2] = "MiniForAll";
+    NoticeVisibilityMode2[NoticeVisibilityMode2["FadedForAutoSkip"] = 3] = "FadedForAutoSkip";
+    NoticeVisibilityMode2[NoticeVisibilityMode2["FadedForAll"] = 4] = "FadedForAll";
+    return NoticeVisibilityMode2;
+  })(NoticeVisibilityMode$1 || {});
+  var SegmentListDefaultTab$1 = /* @__PURE__ */ ((SegmentListDefaultTab2) => {
+    SegmentListDefaultTab2[SegmentListDefaultTab2["Segments"] = 0] = "Segments";
+    SegmentListDefaultTab2[SegmentListDefaultTab2["Chapters"] = 1] = "Chapters";
+    return SegmentListDefaultTab2;
+  })(SegmentListDefaultTab$1 || {});
+
+  let ProtoConfig$1 = class ProtoConfig {
+    constructor(syncDefaults, localDefaults, migrateOldSyncFormats) {
+      this.configLocalListeners = [];
+      this.configSyncListeners = [];
+      this.cachedSyncConfig = null;
+      this.cachedLocalStorage = null;
+      this.config = null;
+      this.local = null;
+      this.syncDefaults = syncDefaults;
+      this.localDefaults = localDefaults;
+      void this.setupConfig(migrateOldSyncFormats).then((result) => {
+        this.config = result?.sync;
+        this.local = result?.local;
+      });
+    }
+    configProxy() {
+      chrome.storage.onChanged.addListener((changes, areaName) => {
+        if (areaName === "sync") {
+          for (const key in changes) {
+            this.cachedSyncConfig[key] = changes[key].newValue;
+          }
+          for (const callback of this.configSyncListeners) {
+            callback(changes);
+          }
+        } else if (areaName === "local") {
+          for (const key in changes) {
+            this.cachedLocalStorage[key] = changes[key].newValue;
+          }
+          for (const callback of this.configLocalListeners) {
+            callback(changes);
+          }
+        }
+      });
+      let lastSet = 0;
+      const nextToUpdate = /* @__PURE__ */ new Set();
+      let activeTimeout = null;
+      const self = this;
+      const syncHandler = {
+        set(obj, prop, value) {
+          self.cachedSyncConfig[prop] = value;
+          if (Date.now() - lastSet < 100) {
+            nextToUpdate.add(prop);
+            if (!activeTimeout) {
+              const delayUpdate = () => {
+                const items = [...nextToUpdate];
+                nextToUpdate.clear();
+                void chrome.storage.sync.set(items.map((v) => [v, self.cachedSyncConfig[v]]).reduce((acc, [k, v]) => {
+                  acc[k] = v;
+                  return acc;
+                }, {}));
+                activeTimeout = null;
+              };
+              activeTimeout = setTimeout(delayUpdate, 20);
+            }
+            return true;
+          }
+          void chrome.storage.sync.set({
+            [prop]: value
+          });
+          lastSet = Date.now();
+          return true;
+        },
+        get(obj, prop) {
+          const data = self.cachedSyncConfig[prop];
+          return obj[prop] || data;
+        },
+        deleteProperty(obj, prop) {
+          void chrome.storage.sync.remove(prop);
+          return true;
+        }
+      };
+      const localHandler = {
+        set(obj, prop, value) {
+          self.cachedLocalStorage[prop] = value;
+          void chrome.storage.local.set({
+            [prop]: value
+          });
+          return true;
+        },
+        get(obj, prop) {
+          const data = self.cachedLocalStorage[prop];
+          return obj[prop] || data;
+        },
+        deleteProperty(obj, prop) {
+          void chrome.storage.local.remove(prop);
+          return true;
+        }
+      };
+      return {
+        sync: new Proxy({ handler: syncHandler }, syncHandler),
+        local: new Proxy({ handler: localHandler }, localHandler)
+      };
+    }
+    forceSyncUpdate(prop) {
+      const value = this.cachedSyncConfig[prop];
+      void chrome.storage.sync.set({
+        [prop]: value
+      });
+    }
+    forceLocalUpdate(prop) {
+      const value = this.cachedLocalStorage[prop];
+      void chrome.storage.local.set({
+        [prop]: value
+      });
+    }
+    async fetchConfig() {
+      await Promise.all([new Promise((resolve) => {
+        chrome.storage.sync.get(null, (items) => {
+          this.cachedSyncConfig = items;
+          if (this.cachedSyncConfig === void 0) {
+            this.cachedSyncConfig = {};
+          }
+          resolve();
+        });
+      }), new Promise((resolve) => {
+        chrome.storage.local.get(null, (items) => {
+          this.cachedLocalStorage = items ?? {};
+          resolve();
+        });
+      })]);
+    }
+    async setupConfig(migrateOldSyncFormats) {
+      if (typeof chrome === "undefined") return null;
+      await this.fetchConfig();
+      this.addDefaults();
+      const result = this.configProxy();
+      migrateOldSyncFormats(result.sync, result.local);
+      return result;
+    }
+    // Add defaults
+    addDefaults() {
+      for (const key in this.syncDefaults) {
+        if (!Object.prototype.hasOwnProperty.call(this.cachedSyncConfig, key)) {
+          this.cachedSyncConfig[key] = this.syncDefaults[key];
+        } else if (key === "barTypes") {
+          for (const key2 in this.syncDefaults[key]) {
+            if (!Object.prototype.hasOwnProperty.call(this.cachedSyncConfig[key], key2)) {
+              this.cachedSyncConfig[key][key2] = this.syncDefaults[key][key2];
+            }
+          }
+        }
+      }
+      for (const key in this.localDefaults) {
+        if (!Object.prototype.hasOwnProperty.call(this.cachedLocalStorage, key)) {
+          this.cachedLocalStorage[key] = this.localDefaults[key];
+        }
+      }
+    }
+    isReady() {
+      return this.config !== null;
+    }
+  };
+  function isSafari$1() {
+    return typeof navigator !== "undefined" && navigator.vendor === "Apple Computer, Inc.";
+  }
+  function keybindEquals$1(first, second) {
+    if (first == null || second == null || Boolean(first.alt) != Boolean(second.alt) || Boolean(first.ctrl) != Boolean(second.ctrl) || Boolean(first.shift) != Boolean(second.shift) || first.key == null && first.code == null || second.key == null && second.code == null)
+      return false;
+    if (first.code != null && second.code != null)
+      return first.code === second.code;
+    if (first.key != null && second.key != null)
+      return first.key.toUpperCase() === second.key.toUpperCase();
+    return false;
+  }
+
+  var PredicateOperator$1 = /* @__PURE__ */ ((PredicateOperator2) => {
+    PredicateOperator2["And"] = "and";
+    PredicateOperator2["Or"] = "or";
+    return PredicateOperator2;
+  })(PredicateOperator$1 || {});
+
+  let ConfigClass$1 = class ConfigClass extends ProtoConfig$1 {
+    resetToDefault() {
+      chrome.storage.sync.set({
+        ...this.syncDefaults,
+        userID: this.config.userID,
+        minutesSaved: this.config.minutesSaved,
+        skipCount: this.config.skipCount,
+        sponsorTimesContributed: this.config.sponsorTimesContributed
+      });
+      chrome.storage.local.set({
+        ...this.localDefaults
+      });
+    }
+  };
+  function migrateOldSyncFormats$1(config, local) {
+    if (local["skipRules"] && local["skipRules"].length !== 0 && local["skipRules"][0]["rules"]) {
+      const output = [];
+      for (const rule of local["skipRules"]) {
+        const rules = rule["rules"];
+        if (rules.length !== 0) {
+          let predicate = {
+            kind: "check",
+            ...rules[0]
+          };
+          for (let i = 1; i < rules.length; i++) {
+            predicate = {
+              kind: "operator",
+              operator: PredicateOperator$1.And,
+              left: predicate,
+              right: {
+                kind: "check",
+                ...rules[i]
+              }
+            };
+          }
+          const comment = rule["comment"];
+          output.push({
+            predicate,
+            skipOption: rule.skipOption,
+            comments: comment.length === 0 ? [] : comment.split(/;\s*/)
+          });
+        }
+      }
+      local["skipRules"] = output;
+    }
+    if (config["whitelistedChannels"]) {
+      const whitelistedChannels = config["whitelistedChannels"];
+      const skipProfileID = "default-whitelist";
+      local.skipProfiles[skipProfileID] = {
+        name: chrome.i18n.getMessage("WhitelistedChannels"),
+        categorySelections: config.categorySelections.filter((s) => !["exclusive_access"].includes(s.name)).map((s) => ({
+          name: s.name,
+          option: CategorySkipOption$1.ShowOverlay
+        })),
+        fullVideoSegments: null,
+        manualSkipOnFullVideo: null,
+        minDuration: null
+      };
+      local.skipProfiles = local.skipProfiles;
+      for (const channelID of whitelistedChannels) {
+        local.channelSkipProfileIDs[channelID] = skipProfileID;
+      }
+      local.channelSkipProfileIDs = local.channelSkipProfileIDs;
+      chrome.storage.sync.remove("whitelistedChannels");
+    }
+    if (config["showZoomToFillError"]) {
+      chrome.storage.sync.remove("showZoomToFillError");
+    }
+    if (config["unsubmittedSegments"] && Object.keys(config["unsubmittedSegments"]).length > 0) {
+      chrome.storage.local.set({
+        unsubmittedSegments: config["unsubmittedSegments"]
+      }, () => {
+        chrome.storage.sync.remove("unsubmittedSegments");
+      });
+    }
+    if (!config["chapterCategoryAdded"]) {
+      config["chapterCategoryAdded"] = true;
+      if (!config.categorySelections.some((s) => s.name === "chapter")) {
+        config.categorySelections.push({
+          name: "chapter",
+          option: CategorySkipOption$1.ShowOverlay
+        });
+        config.categorySelections = config.categorySelections;
+      }
+    }
+    if (config["exclusive_accessCategoryAdded"] !== void 0) {
+      chrome.storage.sync.remove("exclusive_accessCategoryAdded");
+    }
+    if (config["fillerUpdate"] !== void 0) {
+      chrome.storage.sync.remove("fillerUpdate");
+    }
+    if (config["highlightCategoryAdded"] !== void 0) {
+      chrome.storage.sync.remove("highlightCategoryAdded");
+    }
+    if (config["highlightCategoryUpdate"] !== void 0) {
+      chrome.storage.sync.remove("highlightCategoryUpdate");
+    }
+    if (config["askAboutUnlistedVideos"]) {
+      chrome.storage.sync.remove("askAboutUnlistedVideos");
+    }
+    if (config["disableAutoSkip"]) {
+      for (const selection of config.categorySelections) {
+        if (selection.name === "sponsor") {
+          selection.option = CategorySkipOption$1.ManualSkip;
+          chrome.storage.sync.remove("disableAutoSkip");
+        }
+      }
+    }
+    if (typeof config["skipKeybind"] == "string") {
+      config["skipKeybind"] = { key: config["skipKeybind"] };
+    }
+    if (typeof config["startSponsorKeybind"] == "string") {
+      config["startSponsorKeybind"] = { key: config["startSponsorKeybind"] };
+    }
+    if (typeof config["submitKeybind"] == "string") {
+      config["submitKeybind"] = { key: config["submitKeybind"] };
+    }
+    const keybinds = ["skipKeybind", "startSponsorKeybind", "submitKeybind"];
+    for (let i = keybinds.length - 1; i >= 0; i--) {
+      for (let j = 0; j < keybinds.length; j++) {
+        if (i == j)
+          continue;
+        if (keybindEquals$1(config[keybinds[i]], config[keybinds[j]]))
+          config[keybinds[i]] = null;
+      }
+    }
+    if (config["sponsorVideoID"] !== void 0) {
+      chrome.storage.sync.remove("sponsorVideoID");
+    }
+    if (config["previousVideoID"] !== void 0) {
+      chrome.storage.sync.remove("previousVideoID");
+    }
+    if (config["lastIsVipUpdate"]) {
+      chrome.storage.sync.remove("lastIsVipUpdate");
+    }
+  }
+  const syncDefaults$1 = {
+    userID: null,
+    isVip: false,
+    permissions: {},
+    defaultCategory: "chooseACategory",
+    segmentListDefaultTab: SegmentListDefaultTab$1.Segments,
+    renderSegmentsAsChapters: false,
+    forceChannelCheck: false,
+    minutesSaved: 0,
+    skipCount: 0,
+    sponsorTimesContributed: 0,
+    submissionCountSinceCategories: 0,
+    showTimeWithSkips: true,
+    disableSkipping: false,
+    fullVideoSegments: true,
+    fullVideoLabelsOnThumbnails: true,
+    manualSkipOnFullVideo: false,
+    trackViewCount: true,
+    trackViewCountInPrivate: true,
+    trackDownvotes: true,
+    trackDownvotesInPrivate: false,
+    dontShowNotice: false,
+    showUpcomingNotice: false,
+    noticeVisibilityMode: NoticeVisibilityMode$1.FadedForAutoSkip,
+    hideVideoPlayerControls: false,
+    hideInfoButtonPlayerControls: false,
+    hideDeleteButtonPlayerControls: false,
+    hideUploadButtonPlayerControls: false,
+    hideSkipButtonPlayerControls: false,
+    hideDiscordLaunches: 0,
+    hideDiscordLink: false,
+    serverAddress: serverAddress,
+    minDuration: 0,
+    skipNoticeDuration: 4,
+    audioNotificationOnSkip: false,
+    checkForUnlistedVideos: false,
+    testingServer: false,
+    ytInfoPermissionGranted: false,
+    allowExpirements: true,
+    showDonationLink: true,
+    showPopupDonationCount: 0,
+    showUpsells: true,
+    showNewFeaturePopups: true,
+    donateClicked: 0,
+    autoHideInfoButton: true,
+    scrollToEditTimeUpdate: false,
+    // false means the tooltip will be shown
+    categoryPillUpdate: false,
+    hookUpdate: false,
+    showChapterInfoMessage: true,
+    darkMode: true,
+    showCategoryGuidelines: true,
+    showCategoryWithoutPermission: false,
+    showSegmentNameInChapterBar: true,
+    useVirtualTime: true,
+    showSegmentFailedToFetchWarning: true,
+    allowScrollingToEdit: true,
+    showZoomToFillError2: true,
+    cleanPopup: false,
+    hideSegmentCreationInPopup: false,
+    prideTheme: false,
+    categoryPillColors: {},
+    /**
+     * Default keybinds should not set "code" as that's gonna be different based on the user's locale. They should also only use EITHER ctrl OR alt modifiers (or none).
+     * Using ctrl+alt, or shift may produce a different character that we will not be able to recognize in different locales.
+     * The exception for shift is letters, where it only capitalizes. So shift+A is fine, but shift+1 isn't.
+     * Don't forget to add the new keybind to the checks in "KeybindDialogComponent.isKeybindAvailable()" and in "migrateOldFormats()"!
+     *      TODO: Find a way to skip having to update these checks. Maybe storing keybinds in a Map?
+     */
+    skipKeybind: { key: "Enter" },
+    skipToHighlightKeybind: { key: "Enter", ctrl: true },
+    startSponsorKeybind: { key: ";" },
+    submitKeybind: { key: "'" },
+    actuallySubmitKeybind: { key: "'", ctrl: true },
+    previewKeybind: { key: ";", ctrl: true },
+    nextChapterKeybind: { key: "ArrowRight" },
+    previousChapterKeybind: { key: "ArrowLeft" },
+    closeSkipNoticeKeybind: { key: "Backspace" },
+    downvoteKeybind: { key: "h", shift: true },
+    upvoteKeybind: { key: "g", shift: true },
+    categorySelections: [{
+      name: "sponsor",
+      option: CategorySkipOption$1.AutoSkip
+    }, {
+      name: "poi_highlight",
+      option: CategorySkipOption$1.ManualSkip
+    }, {
+      name: "exclusive_access",
+      option: CategorySkipOption$1.ShowOverlay
+    }],
+    colorPalette: {
+      red: "#780303",
+      white: "#ffffff",
+      locked: "#ffc83d"
+    },
+    // Preview bar
+    barTypes: {
+      "preview-chooseACategory": {
+        color: "#ffffff",
+        opacity: "0.7"
+      },
+      "sponsor": {
+        color: "#00d400",
+        opacity: "0.7"
+      },
+      "preview-sponsor": {
+        color: "#007800",
+        opacity: "0.7"
+      },
+      "selfpromo": {
+        color: "#ffff00",
+        opacity: "0.7"
+      },
+      "preview-selfpromo": {
+        color: "#bfbf35",
+        opacity: "0.7"
+      },
+      "exclusive_access": {
+        color: "#008a5c",
+        opacity: "0.7"
+      },
+      "interaction": {
+        color: "#cc00ff",
+        opacity: "0.7"
+      },
+      "preview-interaction": {
+        color: "#6c0087",
+        opacity: "0.7"
+      },
+      "intro": {
+        color: "#00ffff",
+        opacity: "0.7"
+      },
+      "preview-intro": {
+        color: "#008080",
+        opacity: "0.7"
+      },
+      "outro": {
+        color: "#0202ed",
+        opacity: "0.7"
+      },
+      "preview-outro": {
+        color: "#000070",
+        opacity: "0.7"
+      },
+      "preview": {
+        color: "#008fd6",
+        opacity: "0.7"
+      },
+      "preview-preview": {
+        color: "#005799",
+        opacity: "0.7"
+      },
+      "hook": {
+        color: "#395699",
+        opacity: "0.8"
+      },
+      "preview-hook": {
+        color: "#273963",
+        opacity: "0.7"
+      },
+      "poi_highlight": {
+        color: "#ff1684",
+        opacity: "0.7"
+      },
+      "preview-poi_highlight": {
+        color: "#9b044c",
+        opacity: "0.7"
+      },
+      "filler": {
+        color: "#7300FF",
+        opacity: "0.9"
+      },
+      "preview-filler": {
+        color: "#2E0066",
+        opacity: "0.7"
+      }
+    }
+  };
+  const localDefaults$1 = {
+    downvotedSegments: {},
+    navigationApiAvailable: null,
+    alreadyInstalled: false,
+    unsubmittedSegments: {},
+    skipRules: [],
+    channelSkipProfileIDs: {},
+    skipProfiles: {},
+    skipProfileTemp: null
+  };
+  const Config$1 = new ConfigClass$1(syncDefaults$1, localDefaults$1, migrateOldSyncFormats$1);
+
+  function NestedProxy(target) {
+  	return new Proxy(target, {
+  		get(target, prop) {
+  			if (!target[prop]) {
+  				return;
+  			}
+
+  			if (typeof target[prop] !== 'function') {
+  				return new NestedProxy(target[prop]);
+  			}
+
+  			return (...arguments_) =>
+  				new Promise((resolve, reject) => {
+  					target[prop](...arguments_, result => {
+  						if (chrome.runtime.lastError) {
+  							reject(new Error(chrome.runtime.lastError.message));
+  						} else {
+  							resolve(result);
+  						}
+  					});
+  				});
+  		},
+  	});
+  }
+
+  const chromeP$2 = globalThis.chrome && new NestedProxy(globalThis.chrome);
+
+  // Copied from https://github.com/mozilla/gecko-dev/blob/073cc24f53d0cf31403121d768812146e597cc9d/toolkit/components/extensions/schemas/manifest.json#L487-L491
+  const patternValidationRegex = /^(https?|wss?|file|ftp|\*):\/\/(\*|\*\.[^*/]+|[^*/]+)\/.*$|^file:\/\/\/.*$|^resource:\/\/(\*|\*\.[^*/]+|[^*/]+)\/.*$|^about:/;
+  const isFirefox = globalThis.navigator?.userAgent.includes('Firefox/');
+  const allStarsRegex = isFirefox
+      ? /^(https?|wss?):[/][/][^/]+([/].*)?$/
+      : /^https?:[/][/][^/]+([/].*)?$/;
+  const allUrlsRegex = /^(https?|file|ftp):[/]+/;
+  function assertValidPattern(matchPattern) {
+      if (!isValidPattern(matchPattern)) {
+          throw new Error(matchPattern + ' is an invalid pattern. See https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/Match_patterns for more info.');
+      }
+  }
+  function isValidPattern(matchPattern) {
+      return matchPattern === '<all_urls>' || patternValidationRegex.test(matchPattern);
+  }
+  function getRawPatternRegex(matchPattern) {
+      assertValidPattern(matchPattern);
+      // Host undefined for file:///
+      let [, protocol, host = '', pathname] = matchPattern.split(/(^[^:]+:[/][/])([^/]+)?/);
+      protocol = protocol
+          .replace('*', isFirefox ? '(https?|wss?)' : 'https?') // Protocol wildcard
+          .replaceAll(/[/]/g, '[/]'); // Escape slashes
+      if (host === '*') {
+          host = '[^/]+';
+      }
+      host &&= host
+          .replace(/^[*][.]/, '([^/]+.)*') // Initial wildcard
+          .replaceAll(/[.]/g, '[.]') // Escape dots
+          .replace(/[*]$/, '[^.]+'); // Last wildcard
+      pathname = pathname
+          .replaceAll(/[/]/g, '[/]') // Escape slashes
+          .replaceAll(/[.]/g, '[.]') // Escape dots
+          .replaceAll(/[*]/g, '.*'); // Any wildcard
+      return '^' + protocol + host + '(' + pathname + ')?$';
+  }
+  function patternToRegex(...matchPatterns) {
+      // No pattern, match nothing https://stackoverflow.com/q/14115522/288906
+      if (matchPatterns.length === 0) {
+          return /$./;
+      }
+      if (matchPatterns.includes('<all_urls>')) {
+          return allUrlsRegex;
+      }
+      if (matchPatterns.includes('*://*/*')) {
+          return allStarsRegex;
+      }
+      return new RegExp(matchPatterns.map(x => getRawPatternRegex(x)).join('|'));
+  }
+
+  const gotScripting = Boolean(globalThis.chrome?.scripting);
+  function castAllFramesTarget(target) {
+      if (typeof target === 'object') {
+          return { ...target, allFrames: false };
+      }
+      return {
+          tabId: target,
+          frameId: undefined,
+          allFrames: true,
+      };
+  }
+  function castArray(possibleArray) {
+      if (Array.isArray(possibleArray)) {
+          return possibleArray;
+      }
+      return [possibleArray];
+  }
+  function normalizeFiles(files, seen = []) {
+      return files
+          .map(file => typeof file === 'string' ? { file } : file)
+          .filter(content => {
+          if ('code' in content) {
+              return true;
+          }
+          const file = typeof content === 'string' ? content : content.file;
+          if (seen.includes(file)) {
+              console.debug(`Duplicated file not injected: ${file}`);
+              return false;
+          }
+          seen.push(file);
+          return true;
+      });
+  }
+  function arrayOrUndefined(value) {
+      return value === undefined ? undefined : [value];
+  }
+  // eslint-disable-next-line @typescript-eslint/naming-convention -- It follows the native naming
+  async function insertCSS({ tabId, frameId, files, allFrames, matchAboutBlank, runAt, }, { ignoreTargetErrors } = {}) {
+      const normalizedFiles = normalizeFiles(files);
+      const everyInsertion = Promise.all(normalizedFiles.map(async (content) => {
+          if (gotScripting) {
+              // One file at a time, according to the types
+              return chrome.scripting.insertCSS({
+                  target: {
+                      tabId,
+                      frameIds: arrayOrUndefined(frameId),
+                      allFrames: frameId === undefined ? allFrames : undefined,
+                  },
+                  files: 'file' in content ? [content.file] : undefined,
+                  css: 'code' in content ? content.code : undefined,
+              });
+          }
+          return chromeP$2.tabs.insertCSS(tabId, {
+              ...content,
+              matchAboutBlank,
+              allFrames,
+              frameId,
+              runAt: runAt ?? 'document_start', // CSS should prefer `document_start` when unspecified
+          });
+      }));
+      if (ignoreTargetErrors) {
+          await catchTargetInjectionErrors(everyInsertion);
+      }
+      else {
+          await everyInsertion;
+      }
+  }
+  function assertNoCode(files) {
+      if (files.some(content => 'code' in content)) {
+          throw new Error('chrome.scripting does not support injecting strings of `code`');
+      }
+  }
+  async function executeScript({ tabId, frameId, files, allFrames, matchAboutBlank, runAt, }, { ignoreTargetErrors } = {}) {
+      const normalizedFiles = normalizeFiles(files);
+      if (gotScripting) {
+          assertNoCode(normalizedFiles);
+          const injection = chrome.scripting.executeScript({
+              target: {
+                  tabId,
+                  frameIds: arrayOrUndefined(frameId),
+                  allFrames: frameId === undefined ? allFrames : undefined,
+              },
+              files: normalizedFiles.map(({ file }) => file),
+          });
+          if (ignoreTargetErrors) {
+              await catchTargetInjectionErrors(injection);
+          }
+          else {
+              await injection;
+          }
+          // Don't return `injection`; the "return value" of a file is generally not useful
+          return;
+      }
+      // Don't use .map(), `code` injections can't be "parallel"
+      const executions = [];
+      for (const content of normalizedFiles) {
+          // Files are executed in order, but `code` isn’t, so it must await the last script before injecting more
+          if ('code' in content) {
+              // eslint-disable-next-line no-await-in-loop, n/no-unsupported-features/es-syntax -- On purpose, see above
+              await executions.at(-1);
+          }
+          executions.push(chromeP$2.tabs.executeScript(tabId, {
+              ...content,
+              matchAboutBlank,
+              allFrames,
+              frameId,
+              runAt,
+          }));
+      }
+      if (ignoreTargetErrors) {
+          await catchTargetInjectionErrors(Promise.all(executions));
+      }
+      else {
+          await Promise.all(executions);
+      }
+  }
+  async function injectContentScript(where, scripts, options = {}) {
+      const targets = castArray(where);
+      await Promise.all(targets.map(async (target) => injectContentScriptInSpecificTarget(castAllFramesTarget(target), scripts, options)));
+  }
+  async function injectContentScriptInSpecificTarget({ frameId, tabId, allFrames }, scripts, options = {}) {
+      const seen = [];
+      const injections = castArray(scripts).flatMap(script => {
+          const css = normalizeFiles(script.css ?? [], seen);
+          const js = normalizeFiles(script.js ?? [], seen);
+          return [
+              css.length > 0 && insertCSS({
+                  tabId,
+                  frameId,
+                  allFrames,
+                  files: css,
+                  matchAboutBlank: script.matchAboutBlank ?? script.match_about_blank,
+                  runAt: script.runAt ?? script.run_at,
+              }, options),
+              js.length > 0 && executeScript({
+                  tabId,
+                  frameId,
+                  allFrames,
+                  files: js,
+                  matchAboutBlank: script.matchAboutBlank ?? script.match_about_blank,
+                  runAt: script.runAt ?? script.run_at,
+              }, options),
+          ];
+      });
+      await Promise.all(injections);
+  }
+  const targetErrors = /^No frame with id \d+ in tab \d+.$|^No tab with id: \d+.$|^The tab was closed.$|^The frame was removed.$/;
+  async function catchTargetInjectionErrors(promise) {
+      try {
+          await promise;
+      }
+      catch (error) {
+          // @ts-expect-error Optional chaining is good enough
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+          if (!targetErrors.test(error?.message)) {
+              throw error;
+          }
+      }
+  }
+
+  const noMatchesError = 'Type error for parameter contentScriptOptions (Error processing matches: Array requires at least 1 items; you have 0) for contentScripts.register.';
+  const noPermissionError = 'Permission denied to register a content script for ';
+  const gotNavigation = typeof chrome === 'object' && 'webNavigation' in chrome;
+  async function isOriginPermitted(url) {
+      return chromeP$2.permissions.contains({
+          origins: [new URL(url).origin + '/*'],
+      });
+  }
+  // The callback is only used by webextension-polyfill
+  async function registerContentScript(contentScriptOptions, callback) {
+      const { js = [], css = [], matchAboutBlank, matches = [], excludeMatches, runAt, } = contentScriptOptions;
+      let { allFrames } = contentScriptOptions;
+      if (gotNavigation) {
+          allFrames = false;
+      }
+      else if (allFrames) {
+          console.warn('`allFrames: true` requires the `webNavigation` permission to work correctly: https://github.com/fregante/content-scripts-register-polyfill#permissions');
+      }
+      if (matches.length === 0) {
+          throw new Error(noMatchesError);
+      }
+      await Promise.all(matches.map(async (pattern) => {
+          if (!await chromeP$2.permissions.contains({ origins: [pattern] })) {
+              throw new Error(noPermissionError + pattern);
+          }
+      }));
+      const matchesRegex = patternToRegex(...matches);
+      const excludeMatchesRegex = patternToRegex(...excludeMatches !== null && excludeMatches !== void 0 ? excludeMatches : []);
+      const inject = async (url, tabId, frameId = 0) => {
+          if (!matchesRegex.test(url) // Manual `matches` glob matching
+              || excludeMatchesRegex.test(url) // Manual `exclude_matches` glob matching
+              || !await isOriginPermitted(url) // Without this, we might have temporary access via accessTab
+          ) {
+              return;
+          }
+          await injectContentScript({
+              tabId,
+              frameId,
+          }, {
+              css,
+              js,
+              matchAboutBlank,
+              runAt,
+          }, {
+              ignoreTargetErrors: true,
+          });
+      };
+      const tabListener = async (tabId, { status }, { url }) => {
+          // Only status updates are relevant
+          // No URL = no permission
+          if (status === 'loading' && url) {
+              void inject(url, tabId);
+          }
+      };
+      const navListener = async ({ tabId, frameId, url, }) => {
+          void inject(url, tabId, frameId);
+      };
+      if (gotNavigation) {
+          chrome.webNavigation.onCommitted.addListener(navListener);
+      }
+      else {
+          chrome.tabs.onUpdated.addListener(tabListener);
+      }
+      const registeredContentScript = {
+          async unregister() {
+              if (gotNavigation) {
+                  chrome.webNavigation.onCommitted.removeListener(navListener);
+              }
+              else {
+                  chrome.tabs.onUpdated.removeListener(tabListener);
+              }
+          },
+      };
+      if (typeof callback === 'function') {
+          callback(registeredContentScript);
+      }
+      return registeredContentScript;
+  }
+
+  /// <reference path="./globals.d.ts" />
+  // The .js extension is required to create ESM-compatible file
+  if (typeof chrome === 'object' && !chrome.contentScripts) {
+      chrome.contentScripts = { register: registerContentScript };
+  }
+
+  async function waitFor$1(condition, timeout = 5e3, check = 100, predicate) {
+    return await new Promise((resolve, reject) => {
+      let interval = null;
+      const intervalCheck = () => {
+        const result = condition();
+        if (result) {
+          resolve(result);
+          if (interval) clearInterval(interval);
+        }
+      };
+      if (timeout) {
+        setTimeout(() => {
+          clearInterval(interval);
+          reject(`TIMEOUT waiting for ${condition?.toString()}: ${Error().stack}`);
+        }, timeout);
+        interval = setInterval(intervalCheck, check);
+      }
+      intervalCheck();
+    });
+  }
+  function objectToURI$1(url, data, includeQuestionMark) {
+    let counter = 0;
+    for (const key in data) {
+      const seperator = url.includes("?") || counter > 0 ? "&" : "?" ;
+      const value = typeof data[key] === "string" ? data[key] : JSON.stringify(data[key]);
+      url += seperator + encodeURIComponent(key) + "=" + encodeURIComponent(value);
+      counter++;
+    }
+    return url;
+  }
+  const onFirefoxOrSafari$1 = typeof chrome !== "undefined" && !!chrome.runtime?.getManifest()?.browser_specific_settings;
+  typeof chrome !== "undefined" && !!chrome.runtime?.getManifest()?.browser_specific_settings?.gecko;
+  function isFirefoxOrSafari$1() {
+    return onFirefoxOrSafari$1;
+  }
+
+  async function getHash$1(value, times = 5e3) {
+    if (times <= 0) return "";
+    if (!("subtle" in crypto)) {
+      return new Promise((resolve, reject) => chrome.runtime.sendMessage({
+        message: "getHash",
+        value,
+        times
+      }, (response) => {
+        if (response.error) {
+          reject(response.error);
+        } else {
+          resolve(response);
+        }
+      }));
+    }
+    let hashHex = value;
+    for (let i = 0; i < times; i++) {
+      const hashBuffer = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(hashHex).buffer);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      hashHex = hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
+    }
+    return hashHex;
+  }
+
+  async function sendRealRequestToCustomServer$1(type, url, data = {}, headers = {}) {
+    if (type.toLowerCase() === "get") {
+      url = objectToURI$1(url, data);
+      data = null;
+    }
+    const response = await fetch(url, {
+      method: type,
+      headers: {
+        "Content-Type": "application/json",
+        ...headers || {}
+      },
+      redirect: "follow",
+      body: data ? JSON.stringify(data) : null
+    });
+    return response;
+  }
+  function isSerializable$1(value) {
     try {
-      return !!(chrome && chrome.runtime && chrome.runtime.id);
-    } catch (e) {
+      window.structuredClone(value);
+      return true;
+    } catch {
       return false;
     }
   }
+  function serializeOrStringify$1(value) {
+    return isSerializable$1(value) ? value : "toString" in value && typeof value.toString === "function" ? value.toString() : String(value);
+  }
+  function setupBackgroundRequestProxy$1() {
+    if (globalThis.__OSB_PROXY_SETUP) return;
+    globalThis.__OSB_PROXY_SETUP = true;
+    chrome.runtime.onMessage.addListener((request, sender, callback) => {
+      if (request.message === "sendRequest") {
+        sendRealRequestToCustomServer$1(request.type, request.url, request.data, request.headers).then(async (response) => {
+          const buffer = request.binary ? isFirefoxOrSafari$1() && !isSafari$1() ? await response.blob() : Array.from(new Uint8Array(await response.arrayBuffer())) : null;
+          callback({
+            responseText: !request.binary ? await response.text() : "",
+            responseBinary: buffer,
+            headers: request.returnHeaders && response.headers ? [...response.headers.entries()].reduce(
+              (acc, [key, value]) => {
+                acc[key] = value;
+                return acc;
+              },
+              {}
+            ) : null,
+            status: response.status,
+            ok: response.ok
+          });
+        }).catch((error) => {
+          console.error("Proxied request failed:", error);
+          callback({
+            error: serializeOrStringify$1(error)
+          });
+        });
+        return true;
+      }
+      if (request.message === "getHash") {
+        getHash$1(request.value, request.times).then(callback).catch((e) => {
+          console.error("Hash request failed:", e);
+          callback({
+            error: serializeOrStringify$1(e)
+          });
+        });
+        return true;
+      }
+      return false;
+    });
+  }
 
-  if (!isExtensionContextValid()) return;
+  function onTabUpdatedListener$1(tabId) {
+    chrome.tabs.sendMessage(tabId, {
+      message: "update"
+    }, () => void chrome.runtime.lastError);
+  }
+  function onNavigationApiAvailableChange$1(changes) {
+    if (changes.navigationApiAvailable) {
+      if (changes.navigationApiAvailable.newValue) {
+        chrome.tabs.onUpdated.removeListener(onTabUpdatedListener$1);
+      } else {
+        chrome.tabs.onUpdated.addListener(onTabUpdatedListener$1);
+      }
+    }
+  }
+  function setupTabUpdates$1(config) {
+    chrome.tabs.onUpdated.addListener(onTabUpdatedListener$1);
+    void waitFor$1(() => config.local !== null).then(() => {
+      if (config.local.navigationApiAvailable) {
+        chrome.tabs.onUpdated.removeListener(onTabUpdatedListener$1);
+      }
+    });
+    if (!config.configSyncListeners.includes(onNavigationApiAvailableChange$1)) {
+      config.configSyncListeners.push(onNavigationApiAvailableChange$1);
+    }
+  }
 
-  chrome.scripting.getRegisteredContentScripts({ids: ['document-main-world']}).then(function(existing) {
-    if (!existing || existing.length === 0) {
-      chrome.scripting.registerContentScripts([{
-        id: 'document-main-world',
-        js: ['js/document.js'],
-        world: 'MAIN',
-        matches: [
-          'https://*.youtube.com/*',
-          'https://www.youtubekids.com/*',
-          'https://www.youtube-nocookie.com/embed/*',
-          'https://open.spotify.com/*'
-        ],
-        excludeMatches: ['https://accounts.youtube.com/RotateCookiesPage*'],
-        allFrames: true,
-        runAt: 'document_start'
-      }]).catch(function(err) {
-        if (isExtensionContextValid()) {
-          console.error('Failed to register MAIN world script:', err);
+  function generateUserID$1(length = 36) {
+    const charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    let result = "";
+    const cryptoFuncs = typeof window === "undefined" ? crypto : window.crypto;
+    if (cryptoFuncs && cryptoFuncs.getRandomValues) {
+      const values = new Uint32Array(length);
+      cryptoFuncs.getRandomValues(values);
+      for (let i = 0; i < length; i++) {
+        result += charset[values[i] % charset.length];
+      }
+      return result;
+    } else {
+      for (let i = 0; i < length; i++) {
+        result += charset[Math.floor(Math.random() * charset.length)];
+      }
+      return result;
+    }
+  }
+
+  const chromeP$1 = typeof browser === "undefined" ? typeof chrome !== "undefined" ? chrome : null : browser;
+
+  const popupPort$1 = {};
+  const contentScriptRegistrations$1 = {};
+  setupBackgroundRequestProxy$1();
+  setupTabUpdates$1(Config$1);
+  if (!globalThis.__OSB_MAIN_ONMESSAGE) {
+    globalThis.__OSB_MAIN_ONMESSAGE = true;
+    chrome.runtime.onMessage.addListener(function(request, sender, callback) {
+      switch (request.message) {
+        case "openConfig":
+          chrome.tabs.create({ url: chrome.runtime.getURL("options/options.html" + (request.hash ? "#" + request.hash : "")) });
+          return false;
+        case "openHelp":
+          chrome.tabs.create({ url: chrome.runtime.getURL("help/index.html") });
+          return false;
+        case "openPage":
+          chrome.tabs.create({ url: chrome.runtime.getURL(request.url) });
+          return false;
+        case "submitVote":
+          submitVote$1(request.type, request.UUID, request.category, request.videoID).then(callback);
+          return true;
+        case "registerContentScript":
+          registerFirefoxContentScript$1(request);
+          return false;
+        case "unregisterContentScript":
+          unregisterFirefoxContentScript$1(request.id);
+          return false;
+        case "tabs": {
+          chrome.tabs.query({
+            active: true,
+            currentWindow: true
+          }, (tabs) => {
+            chrome.tabs.sendMessage(
+              tabs[0].id,
+              request.data,
+              (response) => {
+                callback(response);
+              }
+            );
+          });
+          return true;
+        }
+        case "time":
+        case "infoUpdated":
+        case "videoChanged":
+          if (sender.tab) {
+            try {
+              popupPort$1[sender.tab.id]?.postMessage(request);
+            } catch (e) {
+            }
+          }
+          return false;
+        default:
+          return false;
+      }
+    });
+  }
+  if (!globalThis.__OSB_MAIN_ONCONNECT) {
+    globalThis.__OSB_MAIN_ONCONNECT = true;
+    chrome.runtime.onConnect.addListener((port) => {
+      if (port.name === "popup") {
+        chrome.tabs.query({
+          active: true,
+          currentWindow: true
+        }, (tabs) => {
+          popupPort$1[tabs[0].id] = port;
+        });
+      }
+    });
+  }
+  chrome.runtime.onInstalled.addListener(function() {
+    setTimeout(async () => {
+      const userID = Config$1.config.userID;
+      if (!userID && !Config$1.local.alreadyInstalled) {
+        chrome.tabs.create({ url: chrome.runtime.getURL("/help/index.html") });
+        const newUserID = generateUserID$1();
+        Config$1.config.userID = newUserID;
+        Config$1.local.alreadyInstalled = true;
+        Config$1.config.categoryPillUpdate = true;
+      }
+    }, 1500);
+  });
+  async function registerFirefoxContentScript$1(options) {
+    if ("scripting" in chrome && "getRegisteredContentScripts" in chrome.scripting) {
+      const existingRegistrations = await chromeP$1.scripting.getRegisteredContentScripts({
+        ids: [options.id]
+      }).catch(() => []);
+      if (existingRegistrations && existingRegistrations.length > 0 && options.matches.every((match) => existingRegistrations[0].matches.includes(match))) {
+        return;
+      }
+    }
+    await unregisterFirefoxContentScript$1(options.id);
+    if ("scripting" in chrome && "getRegisteredContentScripts" in chrome.scripting) {
+      await chromeP$1.scripting.registerContentScripts([{
+        id: options.id,
+        runAt: "document_start",
+        matches: options.matches,
+        allFrames: options.allFrames,
+        js: options.js,
+        css: options.css,
+        persistAcrossSessions: true
+      }]);
+    } else {
+      chrome.contentScripts.register({
+        allFrames: options.allFrames,
+        js: options.js?.map?.((file) => ({ file })),
+        css: options.css?.map?.((file) => ({ file })),
+        matches: options.matches
+      }).then((registration) => void (contentScriptRegistrations$1[options.id] = registration));
+    }
+  }
+  async function unregisterFirefoxContentScript$1(id) {
+    if ("scripting" in chrome && "getRegisteredContentScripts" in chrome.scripting) {
+      try {
+        await chromeP$1.scripting.unregisterContentScripts({
+          ids: [id]
+        });
+      } catch (e) {
+      }
+    } else {
+      if (contentScriptRegistrations$1[id]) {
+        contentScriptRegistrations$1[id].unregister();
+        delete contentScriptRegistrations$1[id];
+      }
+    }
+  }
+  async function submitVote$1(type, UUID, category, videoID) {
+    let userID = Config$1.config.userID;
+    if (userID == void 0 || userID === "undefined") {
+      userID = generateUserID$1();
+      Config$1.config.userID = userID;
+    }
+    const typeSection = type !== void 0 ? "&type=" + type : "&category=" + category;
+    try {
+      const response = await asyncRequestToServer$2("POST", "/api/voteOnSponsorTime?UUID=" + UUID + "&videoID=" + videoID + "&userID=" + userID + typeSection);
+      return {
+        status: response.status,
+        ok: response.ok,
+        responseText: await response.text()
+      };
+    } catch (e) {
+      console.error("Error while voting:", e);
+      return {
+        error: serializeOrStringify$1(e)
+      };
+    }
+  }
+  async function asyncRequestToServer$2(type, address, data = {}) {
+    const serverAddress = Config$1.config.testingServer ? testingServerAddress : Config$1.config.serverAddress;
+    return await sendRealRequestToCustomServer$1(type, serverAddress + address, data);
+  }
+
+  var invidiousList = [
+  	"www.youtubekids.com",
+  	"inv.nadeko.net",
+  	"invidious.f5.si",
+  	"invidious.nerdvpn.de",
+  	"yt.chocolatemoo53.com"
+  ];
+
+  var CategorySkipOption = /* @__PURE__ */ ((CategorySkipOption2) => {
+    CategorySkipOption2[CategorySkipOption2["FallbackToDefault"] = -2] = "FallbackToDefault";
+    CategorySkipOption2[CategorySkipOption2["Disabled"] = -1] = "Disabled";
+    CategorySkipOption2[CategorySkipOption2["ShowOverlay"] = 0] = "ShowOverlay";
+    CategorySkipOption2[CategorySkipOption2["ManualSkip"] = 1] = "ManualSkip";
+    CategorySkipOption2[CategorySkipOption2["AutoSkip"] = 2] = "AutoSkip";
+    return CategorySkipOption2;
+  })(CategorySkipOption || {});
+  var SponsorHideType = /* @__PURE__ */ ((SponsorHideType2) => {
+    SponsorHideType2[SponsorHideType2["Visible"] = void 0] = "Visible";
+    SponsorHideType2[SponsorHideType2["Downvoted"] = 1] = "Downvoted";
+    SponsorHideType2[SponsorHideType2["MinimumDuration"] = 2] = "MinimumDuration";
+    SponsorHideType2[SponsorHideType2["Hidden"] = 3] = "Hidden";
+    return SponsorHideType2;
+  })(SponsorHideType || {});
+  var NoticeVisibilityMode = /* @__PURE__ */ ((NoticeVisibilityMode2) => {
+    NoticeVisibilityMode2[NoticeVisibilityMode2["FullSize"] = 0] = "FullSize";
+    NoticeVisibilityMode2[NoticeVisibilityMode2["MiniForAutoSkip"] = 1] = "MiniForAutoSkip";
+    NoticeVisibilityMode2[NoticeVisibilityMode2["MiniForAll"] = 2] = "MiniForAll";
+    NoticeVisibilityMode2[NoticeVisibilityMode2["FadedForAutoSkip"] = 3] = "FadedForAutoSkip";
+    NoticeVisibilityMode2[NoticeVisibilityMode2["FadedForAll"] = 4] = "FadedForAll";
+    return NoticeVisibilityMode2;
+  })(NoticeVisibilityMode || {});
+  var SegmentListDefaultTab = /* @__PURE__ */ ((SegmentListDefaultTab2) => {
+    SegmentListDefaultTab2[SegmentListDefaultTab2["Segments"] = 0] = "Segments";
+    SegmentListDefaultTab2[SegmentListDefaultTab2["Chapters"] = 1] = "Chapters";
+    return SegmentListDefaultTab2;
+  })(SegmentListDefaultTab || {});
+
+  async function waitFor(condition, timeout = 5e3, check = 100, predicate) {
+    return await new Promise((resolve, reject) => {
+      let interval = null;
+      const intervalCheck = () => {
+        const result = condition();
+        if (result) {
+          resolve(result);
+          if (interval) clearInterval(interval);
+        }
+      };
+      if (timeout) {
+        setTimeout(() => {
+          clearInterval(interval);
+          reject(`TIMEOUT waiting for ${condition?.toString()}: ${Error().stack}`);
+        }, timeout);
+        interval = setInterval(intervalCheck, check);
+      }
+      intervalCheck();
+    });
+  }
+  function objectToURI(url, data, includeQuestionMark) {
+    let counter = 0;
+    for (const key in data) {
+      const seperator = url.includes("?") || counter > 0 ? "&" : "?" ;
+      const value = typeof data[key] === "string" ? data[key] : JSON.stringify(data[key]);
+      url += seperator + encodeURIComponent(key) + "=" + encodeURIComponent(value);
+      counter++;
+    }
+    return url;
+  }
+  const onFirefoxOrSafari = typeof chrome !== "undefined" && !!chrome.runtime.getManifest().browser_specific_settings;
+  typeof chrome !== "undefined" && !!chrome.runtime.getManifest().browser_specific_settings?.gecko;
+  function isFirefoxOrSafari() {
+    return onFirefoxOrSafari;
+  }
+
+  class ProtoConfig {
+    constructor(syncDefaults, localDefaults, migrateOldSyncFormats, inDeArrow = false) {
+      this.configLocalListeners = [];
+      this.configSyncListeners = [];
+      this.cachedSyncConfig = null;
+      this.cachedLocalStorage = null;
+      this.config = null;
+      this.local = null;
+      this.inDeArrow = false;
+      this.ignoreLocal = false;
+      this.syncDefaults = syncDefaults;
+      this.localDefaults = localDefaults ?? {};
+      this.ignoreLocal = localDefaults === null;
+      this.inDeArrow = inDeArrow;
+      void this.setupConfig(migrateOldSyncFormats).then((result) => {
+        this.config = result?.sync;
+        this.local = result?.local;
+      });
+    }
+    configProxy() {
+      chrome.storage.sync.onChanged.addListener((changes) => {
+        for (const key in changes) {
+          this.cachedSyncConfig[key] = changes[key].newValue;
+        }
+        for (const callback of this.configSyncListeners) {
+          callback(changes);
+        }
+      });
+      if (!this.ignoreLocal) {
+        chrome.storage.local.onChanged.addListener((changes) => {
+          for (const key in changes) {
+            this.cachedLocalStorage[key] = changes[key].newValue;
+          }
+          for (const callback of this.configLocalListeners) {
+            callback(changes);
+          }
+        });
+      }
+      let lastSet = 0;
+      const nextToUpdate = /* @__PURE__ */ new Set();
+      let activeTimeout = null;
+      const self = this;
+      const syncHandler = {
+        set(obj, prop, value) {
+          self.cachedSyncConfig[prop] = value;
+          if (Date.now() - lastSet < 100) {
+            nextToUpdate.add(prop);
+            if (!activeTimeout) {
+              const delayUpdate = () => {
+                const items = [...nextToUpdate];
+                nextToUpdate.clear();
+                void chrome.storage.sync.set(items.map((v) => [v, self.cachedSyncConfig[v]]).reduce((acc, [k, v]) => {
+                  acc[k] = v;
+                  return acc;
+                }, {}));
+                activeTimeout = null;
+              };
+              activeTimeout = setTimeout(delayUpdate, 20);
+            }
+            return true;
+          }
+          void chrome.storage.sync.set({
+            [prop]: value
+          });
+          lastSet = Date.now();
+          return true;
+        },
+        get(obj, prop) {
+          const data = self.cachedSyncConfig[prop];
+          return obj[prop] || data;
+        },
+        deleteProperty(obj, prop) {
+          void chrome.storage.sync.remove(prop);
+          return true;
+        }
+      };
+      const localHandler = {
+        set(obj, prop, value) {
+          self.cachedLocalStorage[prop] = value;
+          void chrome.storage.local.set({
+            [prop]: value
+          });
+          return true;
+        },
+        get(obj, prop) {
+          const data = self.cachedLocalStorage[prop];
+          return obj[prop] || data;
+        },
+        deleteProperty(obj, prop) {
+          void chrome.storage.local.remove(prop);
+          return true;
+        }
+      };
+      return {
+        sync: new Proxy({ handler: syncHandler }, syncHandler),
+        local: new Proxy({ handler: localHandler }, localHandler)
+      };
+    }
+    forceSyncUpdate(prop) {
+      const value = this.cachedSyncConfig[prop];
+      void chrome.storage.sync.set({
+        [prop]: value
+      });
+    }
+    forceLocalUpdate(prop) {
+      const value = this.cachedLocalStorage[prop];
+      void chrome.storage.local.set({
+        [prop]: value
+      }, () => {
+        const error = chrome.runtime.lastError;
+        if (error && prop !== "navigationApiAvailable") {
+          alert(`SponsorBlock/DeArrow: ${chrome.i18n.getMessage("storageFull")}
+
+${error}`);
         }
       });
     }
-  }).catch(function() {
-    // getRegisteredContentScripts not available — try registering directly
-    chrome.scripting.registerContentScripts([{
-      id: 'document-main-world',
-      js: ['js/document.js'],
-      world: 'MAIN',
-      matches: [
-        'https://*.youtube.com/*',
-        'https://www.youtubekids.com/*',
-        'https://www.youtube-nocookie.com/embed/*',
-        'https://open.spotify.com/*'
-      ],
-      excludeMatches: ['https://accounts.youtube.com/RotateCookiesPage*'],
-      allFrames: true,
-      runAt: 'document_start'
-    }]).catch(function(err) {
-      if (isExtensionContextValid()) {
-        console.error('Failed to register MAIN world script:', err);
+    async fetchConfig() {
+      await Promise.all([new Promise((resolve) => {
+        chrome.storage.sync.get(null, (items) => {
+          this.cachedSyncConfig = items;
+          if (this.cachedSyncConfig === void 0) {
+            this.cachedSyncConfig = {};
+            if (this.inDeArrow || window.location.href.includes("options.html")) {
+              alert(`${chrome.i18n.getMessage("syncDisabledWarning")}${this.inDeArrow ? `
+
+${chrome.i18n.getMessage("syncDisabledWarningDeArrow")}` : ``}${isFirefoxOrSafari() && !isSafari() ? `
+
+${chrome.i18n.getMessage("syncDisabledFirefoxSuggestions")}` : ``}`);
+            }
+          }
+          resolve();
+        });
+      }), new Promise((resolve) => {
+        if (!this.ignoreLocal) {
+          chrome.storage.local.get(null, (items) => {
+            this.cachedLocalStorage = items ?? {};
+            resolve();
+          });
+        } else {
+          resolve();
+        }
+      })]);
+    }
+    async setupConfig(migrateOldSyncFormats) {
+      if (typeof chrome === "undefined") return null;
+      await this.fetchConfig();
+      this.addDefaults();
+      const result = this.configProxy();
+      migrateOldSyncFormats(result.sync, result.local);
+      return result;
+    }
+    // Add defaults
+    addDefaults() {
+      for (const key in this.syncDefaults) {
+        if (!Object.prototype.hasOwnProperty.call(this.cachedSyncConfig, key)) {
+          this.cachedSyncConfig[key] = this.syncDefaults[key];
+        } else if (key === "barTypes") {
+          for (const key2 in this.syncDefaults[key]) {
+            if (!Object.prototype.hasOwnProperty.call(this.cachedSyncConfig[key], key2)) {
+              this.cachedSyncConfig[key][key2] = this.syncDefaults[key][key2];
+            }
+          }
+        }
+      }
+      for (const key in this.localDefaults) {
+        if (!Object.prototype.hasOwnProperty.call(this.cachedLocalStorage, key)) {
+          this.cachedLocalStorage[key] = this.localDefaults[key];
+        }
+      }
+    }
+    isReady() {
+      return this.config !== null;
+    }
+  }
+  function isSafari() {
+    return typeof navigator !== "undefined" && navigator.vendor === "Apple Computer, Inc.";
+  }
+  function keybindEquals(first, second) {
+    if (first == null || second == null || Boolean(first.alt) != Boolean(second.alt) || Boolean(first.ctrl) != Boolean(second.ctrl) || Boolean(first.shift) != Boolean(second.shift) || first.key == null && first.code == null || second.key == null && second.code == null)
+      return false;
+    if (first.code != null && second.code != null)
+      return first.code === second.code;
+    if (first.key != null && second.key != null)
+      return first.key.toUpperCase() === second.key.toUpperCase();
+    return false;
+  }
+
+  var PredicateOperator = /* @__PURE__ */ ((PredicateOperator2) => {
+    PredicateOperator2["And"] = "and";
+    PredicateOperator2["Or"] = "or";
+    return PredicateOperator2;
+  })(PredicateOperator || {});
+
+  class ConfigClass extends ProtoConfig {
+    resetToDefault() {
+      chrome.storage.sync.set({
+        ...this.syncDefaults,
+        userID: this.config.userID,
+        minutesSaved: this.config.minutesSaved,
+        skipCount: this.config.skipCount,
+        sponsorTimesContributed: this.config.sponsorTimesContributed
+      });
+      chrome.storage.local.set({
+        ...this.localDefaults
+      });
+    }
+  }
+  function migrateOldSyncFormats(config, local) {
+    if (local["skipRules"] && local["skipRules"].length !== 0 && local["skipRules"][0]["rules"]) {
+      const output = [];
+      for (const rule of local["skipRules"]) {
+        const rules = rule["rules"];
+        if (rules.length !== 0) {
+          let predicate = {
+            kind: "check",
+            ...rules[0]
+          };
+          for (let i = 1; i < rules.length; i++) {
+            predicate = {
+              kind: "operator",
+              operator: PredicateOperator.And,
+              left: predicate,
+              right: {
+                kind: "check",
+                ...rules[i]
+              }
+            };
+          }
+          const comment = rule["comment"];
+          output.push({
+            predicate,
+            skipOption: rule.skipOption,
+            comments: comment.length === 0 ? [] : comment.split(/;\s*/)
+          });
+        }
+      }
+      local["skipRules"] = output;
+    }
+    if (config["whitelistedChannels"]) {
+      const whitelistedChannels = config["whitelistedChannels"];
+      const skipProfileID = "default-whitelist";
+      local.skipProfiles[skipProfileID] = {
+        name: chrome.i18n.getMessage("WhitelistedChannels"),
+        categorySelections: config.categorySelections.filter((s) => !["exclusive_access", "chapter"].includes(s.name)).map((s) => ({
+          name: s.name,
+          option: CategorySkipOption.ShowOverlay
+        })),
+        showAutogeneratedChapters: null,
+        showCreatorChapters: null,
+        autoSkipOnMusicVideos: null,
+        skipNonMusicOnlyOnYoutubeMusic: null,
+        muteSegments: null,
+        fullVideoSegments: null,
+        manualSkipOnFullVideo: null,
+        minDuration: null
+      };
+      local.skipProfiles = local.skipProfiles;
+      for (const channelID of whitelistedChannels) {
+        local.channelSkipProfileIDs[channelID] = skipProfileID;
+      }
+      local.channelSkipProfileIDs = local.channelSkipProfileIDs;
+      chrome.storage.sync.remove("whitelistedChannels");
+    }
+    if (!config["changeChapterColor"]) {
+      config.barTypes["chapter"].color = "#ffd983";
+      config["changeChapterColor"] = true;
+      chrome.storage.sync.set({
+        "changeChapterColor": true,
+        "barTypes": config.barTypes
+      });
+    }
+    if (config["showZoomToFillError"]) {
+      chrome.storage.sync.remove("showZoomToFillError");
+    }
+    if (config["unsubmittedSegments"] && Object.keys(config["unsubmittedSegments"]).length > 0) {
+      chrome.storage.local.set({
+        unsubmittedSegments: config["unsubmittedSegments"]
+      }, () => {
+        chrome.storage.sync.remove("unsubmittedSegments");
+      });
+    }
+    if (!config["chapterCategoryAdded"]) {
+      config["chapterCategoryAdded"] = true;
+      if (!config.categorySelections.some((s) => s.name === "chapter")) {
+        config.categorySelections.push({
+          name: "chapter",
+          option: CategorySkipOption.ShowOverlay
+        });
+        config.categorySelections = config.categorySelections;
+      }
+    }
+    if (config["exclusive_accessCategoryAdded"] !== void 0) {
+      chrome.storage.sync.remove("exclusive_accessCategoryAdded");
+    }
+    if (config["fillerUpdate"] !== void 0) {
+      chrome.storage.sync.remove("fillerUpdate");
+    }
+    if (config["highlightCategoryAdded"] !== void 0) {
+      chrome.storage.sync.remove("highlightCategoryAdded");
+    }
+    if (config["highlightCategoryUpdate"] !== void 0) {
+      chrome.storage.sync.remove("highlightCategoryUpdate");
+    }
+    if (config["askAboutUnlistedVideos"]) {
+      chrome.storage.sync.remove("askAboutUnlistedVideos");
+    }
+    if (!config["autoSkipOnMusicVideosUpdate"]) {
+      config["autoSkipOnMusicVideosUpdate"] = true;
+      for (const selection of config.categorySelections) {
+        if (selection.name === "music_offtopic" && selection.option === CategorySkipOption.AutoSkip) {
+          config.autoSkipOnMusicVideos = true;
+          break;
+        }
+      }
+    }
+    if (config["disableAutoSkip"]) {
+      for (const selection of config.categorySelections) {
+        if (selection.name === "sponsor") {
+          selection.option = CategorySkipOption.ManualSkip;
+          chrome.storage.sync.remove("disableAutoSkip");
+        }
+      }
+    }
+    if (typeof config["skipKeybind"] == "string") {
+      config["skipKeybind"] = { key: config["skipKeybind"] };
+    }
+    if (typeof config["startSponsorKeybind"] == "string") {
+      config["startSponsorKeybind"] = { key: config["startSponsorKeybind"] };
+    }
+    if (typeof config["submitKeybind"] == "string") {
+      config["submitKeybind"] = { key: config["submitKeybind"] };
+    }
+    const keybinds = ["skipKeybind", "startSponsorKeybind", "submitKeybind"];
+    for (let i = keybinds.length - 1; i >= 0; i--) {
+      for (let j = 0; j < keybinds.length; j++) {
+        if (i == j)
+          continue;
+        if (keybindEquals(config[keybinds[i]], config[keybinds[j]]))
+          config[keybinds[i]] = null;
+      }
+    }
+    if (config["sponsorVideoID"] !== void 0) {
+      chrome.storage.sync.remove("sponsorVideoID");
+    }
+    if (config["previousVideoID"] !== void 0) {
+      chrome.storage.sync.remove("previousVideoID");
+    }
+    if (!config["supportInvidious"] && config["invidiousInstances"].length < invidiousList.length) {
+      config["invidiousInstances"] = [.../* @__PURE__ */ new Set([...invidiousList, ...config["invidiousInstances"]])];
+    }
+    if (config["lastIsVipUpdate"]) {
+      chrome.storage.sync.remove("lastIsVipUpdate");
+    }
+  }
+  const syncDefaults = {
+    userID: null,
+    isVip: false,
+    permissions: {},
+    defaultCategory: "chooseACategory",
+    segmentListDefaultTab: SegmentListDefaultTab.Segments,
+    renderSegmentsAsChapters: false,
+    forceChannelCheck: false,
+    minutesSaved: 0,
+    skipCount: 0,
+    sponsorTimesContributed: 0,
+    submissionCountSinceCategories: 0,
+    showTimeWithSkips: true,
+    disableSkipping: false,
+    muteSegments: true,
+    fullVideoSegments: true,
+    fullVideoLabelsOnThumbnails: true,
+    manualSkipOnFullVideo: false,
+    trackViewCount: true,
+    trackViewCountInPrivate: true,
+    trackDownvotes: true,
+    trackDownvotesInPrivate: false,
+    dontShowNotice: false,
+    showUpcomingNotice: false,
+    noticeVisibilityMode: NoticeVisibilityMode.FadedForAutoSkip,
+    hideVideoPlayerControls: false,
+    hideInfoButtonPlayerControls: false,
+    hideDeleteButtonPlayerControls: false,
+    hideUploadButtonPlayerControls: false,
+    hideSkipButtonPlayerControls: false,
+    hideDiscordLaunches: 0,
+    hideDiscordLink: false,
+    invidiousInstances: [],
+    supportInvidious: false,
+    serverAddress: serverAddress,
+    minDuration: 0,
+    skipNoticeDuration: 4,
+    audioNotificationOnSkip: false,
+    checkForUnlistedVideos: false,
+    testingServer: false,
+    ytInfoPermissionGranted: false,
+    allowExpirements: true,
+    showDonationLink: true,
+    showPopupDonationCount: 0,
+    showUpsells: true,
+    showNewFeaturePopups: true,
+    donateClicked: 0,
+    autoHideInfoButton: true,
+    autoSkipOnMusicVideos: false,
+    skipNonMusicOnlyOnYoutubeMusic: false,
+    scrollToEditTimeUpdate: false,
+    // false means the tooltip will be shown
+    categoryPillUpdate: false,
+    hookUpdate: false,
+    showChapterInfoMessage: true,
+    darkMode: true,
+    showCategoryGuidelines: true,
+    showCategoryWithoutPermission: false,
+    showSegmentNameInChapterBar: true,
+    showAutogeneratedChapters: true,
+    showCreatorChapters: true,
+    useVirtualTime: true,
+    showSegmentFailedToFetchWarning: true,
+    allowScrollingToEdit: true,
+    deArrowInstalled: false,
+    showDeArrowPromotion: true,
+    showDeArrowInSettings: true,
+    shownDeArrowPromotion: false,
+    showZoomToFillError2: true,
+    cleanPopup: false,
+    hideSegmentCreationInPopup: false,
+    prideTheme: false,
+    categoryPillColors: {},
+    /**
+     * Default keybinds should not set "code" as that's gonna be different based on the user's locale. They should also only use EITHER ctrl OR alt modifiers (or none).
+     * Using ctrl+alt, or shift may produce a different character that we will not be able to recognize in different locales.
+     * The exception for shift is letters, where it only capitalizes. So shift+A is fine, but shift+1 isn't.
+     * Don't forget to add the new keybind to the checks in "KeybindDialogComponent.isKeybindAvailable()" and in "migrateOldFormats()"!
+     *      TODO: Find a way to skip having to update these checks. Maybe storing keybinds in a Map?
+     */
+    skipKeybind: { key: "Enter" },
+    skipToHighlightKeybind: { key: "Enter", ctrl: true },
+    startSponsorKeybind: { key: ";" },
+    submitKeybind: { key: "'" },
+    actuallySubmitKeybind: { key: "'", ctrl: true },
+    previewKeybind: { key: ";", ctrl: true },
+    nextChapterKeybind: { key: "ArrowRight", ctrl: true },
+    previousChapterKeybind: { key: "ArrowLeft", ctrl: true },
+    closeSkipNoticeKeybind: { key: "Backspace" },
+    downvoteKeybind: { key: "h", shift: true },
+    upvoteKeybind: { key: "g", shift: true },
+    categorySelections: [{
+      name: "sponsor",
+      option: CategorySkipOption.AutoSkip
+    }, {
+      name: "poi_highlight",
+      option: CategorySkipOption.ManualSkip
+    }, {
+      name: "exclusive_access",
+      option: CategorySkipOption.ShowOverlay
+    }, {
+      name: "chapter",
+      option: CategorySkipOption.ShowOverlay
+    }],
+    payments: {
+      licenseKey: null,
+      lastCheck: 0,
+      lastFreeCheck: 0,
+      freeAccess: false,
+      chaptersAllowed: false
+    },
+    colorPalette: {
+      red: "#780303",
+      white: "#ffffff",
+      locked: "#ffc83d"
+    },
+    // Preview bar
+    barTypes: {
+      "preview-chooseACategory": {
+        color: "#ffffff",
+        opacity: "0.7"
+      },
+      "sponsor": {
+        color: "#00d400",
+        opacity: "0.7"
+      },
+      "preview-sponsor": {
+        color: "#007800",
+        opacity: "0.7"
+      },
+      "selfpromo": {
+        color: "#ffff00",
+        opacity: "0.7"
+      },
+      "preview-selfpromo": {
+        color: "#bfbf35",
+        opacity: "0.7"
+      },
+      "exclusive_access": {
+        color: "#008a5c",
+        opacity: "0.7"
+      },
+      "interaction": {
+        color: "#cc00ff",
+        opacity: "0.7"
+      },
+      "preview-interaction": {
+        color: "#6c0087",
+        opacity: "0.7"
+      },
+      "intro": {
+        color: "#00ffff",
+        opacity: "0.7"
+      },
+      "preview-intro": {
+        color: "#008080",
+        opacity: "0.7"
+      },
+      "outro": {
+        color: "#0202ed",
+        opacity: "0.7"
+      },
+      "preview-outro": {
+        color: "#000070",
+        opacity: "0.7"
+      },
+      "preview": {
+        color: "#008fd6",
+        opacity: "0.7"
+      },
+      "preview-preview": {
+        color: "#005799",
+        opacity: "0.7"
+      },
+      "hook": {
+        color: "#395699",
+        opacity: "0.8"
+      },
+      "preview-hook": {
+        color: "#273963",
+        opacity: "0.7"
+      },
+      "music_offtopic": {
+        color: "#ff9900",
+        opacity: "0.7"
+      },
+      "preview-music_offtopic": {
+        color: "#a6634a",
+        opacity: "0.7"
+      },
+      "poi_highlight": {
+        color: "#ff1684",
+        opacity: "0.7"
+      },
+      "preview-poi_highlight": {
+        color: "#9b044c",
+        opacity: "0.7"
+      },
+      "filler": {
+        color: "#7300FF",
+        opacity: "0.9"
+      },
+      "preview-filler": {
+        color: "#2E0066",
+        opacity: "0.7"
+      },
+      "chapter": {
+        color: "#ffd983",
+        opacity: "0"
+      }
+    }
+  };
+  const localDefaults = {
+    downvotedSegments: {},
+    navigationApiAvailable: null,
+    alreadyInstalled: false,
+    unsubmittedSegments: {},
+    skipRules: [],
+    channelSkipProfileIDs: {},
+    skipProfiles: {},
+    skipProfileTemp: null
+  };
+  const Config = new ConfigClass(syncDefaults, localDefaults, migrateOldSyncFormats);
+
+  function isBodyGarbage(body) {
+    return body.startsWith("<!DOCTYPE html>") || body.startsWith("<html>") || body.includes(`cf-wrapper`);
+  }
+  function getLongErrorMessage(statusCode, responseText) {
+    if (statusCode === 0) {
+      return chrome.i18n.getMessage("0");
+    }
+    const postFix = responseText && !isBodyGarbage(responseText) ? "\n\n" + responseText : "";
+    let introString = chrome.i18n.getMessage(`${statusCode === 503 ? 502 : statusCode}`);
+    if (introString === "") {
+      introString = chrome.i18n.getMessage("connectionError");
+    }
+    const errorCodeString = chrome.i18n.getMessage("errorCode").replace("{code}", `${statusCode}`);
+    const reminder = statusCode === 502 || statusCode === 503 ? `
+
+${chrome.i18n.getMessage("statusReminder")}` : "";
+    return `${introString} ${errorCodeString}${postFix}${reminder}`;
+  }
+  function formatJSErrorMessage(error) {
+    const introString = chrome.i18n.getMessage("connectionError");
+    return `${introString} ${error}`;
+  }
+
+  async function getHash(value, times = 5e3) {
+    if (times <= 0) return "";
+    if (!("subtle" in crypto)) {
+      return new Promise((resolve, reject) => chrome.runtime.sendMessage({
+        message: "getHash",
+        value,
+        times
+      }, (response) => {
+        if (response.error) {
+          reject(response.error);
+        } else {
+          resolve(response);
+        }
+      }));
+    }
+    let hashHex = value;
+    for (let i = 0; i < times; i++) {
+      const hashBuffer = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(hashHex).buffer);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      hashHex = hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
+    }
+    return hashHex;
+  }
+
+  async function sendRealRequestToCustomServer(type, url, data = {}, headers = {}) {
+    if (type.toLowerCase() === "get") {
+      url = objectToURI(url, data);
+      data = null;
+    }
+    const response = await fetch(url, {
+      method: type,
+      headers: {
+        "Content-Type": "application/json",
+        ...headers || {}
+      },
+      redirect: "follow",
+      body: data ? JSON.stringify(data) : null
+    });
+    return response;
+  }
+  function isSerializable(value) {
+    try {
+      window.structuredClone(value);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+  function serializeOrStringify(value) {
+    return isSerializable(value) ? value : "toString" in value && typeof value.toString === "function" ? value.toString() : String(value);
+  }
+  function setupBackgroundRequestProxy() {
+    if (globalThis.__OSB_PROXY_SETUP) return;
+    globalThis.__OSB_PROXY_SETUP = true;
+    chrome.runtime.onMessage.addListener((request, sender, callback) => {
+      if (request.message === "sendRequest") {
+        sendRealRequestToCustomServer(request.type, request.url, request.data, request.headers).then(async (response) => {
+          const buffer = request.binary ? isFirefoxOrSafari() && !isSafari() ? await response.blob() : Array.from(new Uint8Array(await response.arrayBuffer())) : null;
+          callback({
+            responseText: !request.binary ? await response.text() : "",
+            responseBinary: buffer,
+            headers: request.returnHeaders && response.headers ? [...response.headers.entries()].reduce(
+              (acc, [key, value]) => {
+                acc[key] = value;
+                return acc;
+              },
+              {}
+            ) : null,
+            status: response.status,
+            ok: response.ok
+          });
+        }).catch((error) => {
+          console.error("Proxied request failed:", error);
+          callback({
+            error: serializeOrStringify(error)
+          });
+        });
+        return true;
+      }
+      if (request.message === "getHash") {
+        getHash(request.value, request.times).then(callback).catch((e) => {
+          console.error("Hash request failed:", e);
+          callback({
+            error: serializeOrStringify(e)
+          });
+        });
+        return true;
+      }
+      return false;
+    });
+  }
+  function sendRequestToCustomServer(type, url, data = {}, headers = {}) {
+    return new Promise((resolve, reject) => {
+      try {
+        chrome.runtime.sendMessage({
+          message: "sendRequest",
+          type,
+          url,
+          data,
+          headers
+        }, (response) => {
+          if (response == null) {
+            reject(new Error(`Got ${response} response from background page`));
+          } else if ("error" in response) {
+            reject(response.error);
+          } else {
+            resolve(response);
+          }
+        });
+      } catch (e) {
+        reject(e);
       }
     });
+  }
+  function logRequest(request, prefix, requestDescription) {
+    const body = "responseText" in request && !isBodyGarbage(request.responseText) ? `: ${request.responseText}` : "";
+    console.warn(`[${prefix}] Server responded with code ${request.status} to a ${requestDescription} request${body}`);
+  }
+
+  function onTabUpdatedListener(tabId) {
+    chrome.tabs.sendMessage(tabId, {
+      message: "update"
+    }, () => void chrome.runtime.lastError);
+  }
+  function onNavigationApiAvailableChange(changes) {
+    if (changes.navigationApiAvailable) {
+      if (changes.navigationApiAvailable.newValue) {
+        chrome.tabs.onUpdated.removeListener(onTabUpdatedListener);
+      } else {
+        chrome.tabs.onUpdated.addListener(onTabUpdatedListener);
+      }
+    }
+  }
+  function setupTabUpdates(config) {
+    chrome.tabs.onUpdated.addListener(onTabUpdatedListener);
+    chrome.storage.local.get("navigationApiAvailable", (v) => {
+      if (v.navigationApiAvailable) {
+        chrome.tabs.onUpdated.removeListener(onTabUpdatedListener);
+      }
+    });
+    if (!config.configSyncListeners.includes(onNavigationApiAvailableChange)) {
+      config.configSyncListeners.push(onNavigationApiAvailableChange);
+    }
+  }
+
+  function generateUserID(length = 36) {
+    const charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    let result = "";
+    const cryptoFuncs = typeof window === "undefined" ? crypto : window.crypto;
+    if (cryptoFuncs && cryptoFuncs.getRandomValues) {
+      const values = new Uint32Array(length);
+      cryptoFuncs.getRandomValues(values);
+      for (let i = 0; i < length; i++) {
+        result += charset[values[i] % charset.length];
+      }
+      return result;
+    } else {
+      for (let i = 0; i < length; i++) {
+        result += charset[Math.floor(Math.random() * charset.length)];
+      }
+      return result;
+    }
+  }
+
+  function isVisible(element, ignoreWidth = false) {
+    if (!element) {
+      return false;
+    }
+    if (element.tagName === "VIDEO" && (element.classList.contains("html5-main-video") || element.id === "player" || element.id === "player_html5_api") && [...document.querySelectorAll("video")].filter((v) => v.duration).length === 1 && element.duration) {
+      return true;
+    }
+    if (element.tagName === "VIDEO" && element.offsetHeight) {
+      return true;
+    }
+    if (element.offsetHeight === 0 || element.offsetWidth === 0 && !ignoreWidth) {
+      return false;
+    }
+    const boundingRect = element?.getBoundingClientRect();
+    const elementAtPoint = document.elementFromPoint(
+      boundingRect.left + boundingRect.width / 2,
+      boundingRect.top + boundingRect.height / 2
+    ) || document.elementFromPoint(boundingRect.left, boundingRect.top);
+    if (!elementAtPoint && element.id === "movie_player" && boundingRect.top < 0) {
+      return true;
+    }
+    if (elementAtPoint === element || !!elementAtPoint && element.contains(elementAtPoint) || !!elementAtPoint && elementAtPoint.contains(element)) {
+      return true;
+    }
+    if (element.tagName === "VIDEO") {
+      return !!elementAtPoint?.closest(".html5-video-player")?.contains(element) || !!element?.closest("#inline-preview-player")?.classList?.contains("playing-mode");
+    }
+    return false;
+  }
+  function isVisibleOrParent(element, ignoreWidth = false, checkParent = true) {
+    return isVisible(element, ignoreWidth) || checkParent && !!element && (isVisible(element.parentElement, ignoreWidth) || isVisible(element.parentElement?.parentElement ?? null, ignoreWidth));
+  }
+  function findValidElementFromSelector(selectors, ignoreWidth = false, checkParent = false) {
+    return findValidElementFromGenerator(selectors, ignoreWidth, checkParent, (selector) => document.querySelector(selector));
+  }
+  function findValidElementFromGenerator(objects, ignoreWidth = false, checkParent = false, generator) {
+    for (const obj of objects) {
+      const element = generator ? generator(obj) : obj;
+      if (element && isVisibleOrParent(element, ignoreWidth, checkParent)) {
+        return element;
+      }
+    }
+    return null;
+  }
+
+  async function asyncRequestToServer$1(type, address, data = {}, headers = {}) {
+    const serverAddress = Config.config.testingServer ? testingServerAddress : Config.config.serverAddress;
+    return await sendRequestToCustomServer(type, serverAddress + address, data, headers);
+  }
+
+  class Utils {
+    constructor(backgroundScriptContainer = null) {
+      // Used to add content scripts and CSS required
+      this.js = [
+        "./js/content.js"
+      ];
+      this.css = [
+        "content.css",
+        "./libs/Source+Sans+Pro.css",
+        "popup.css",
+        "shared.css"
+      ];
+      this.backgroundScriptContainer = backgroundScriptContainer;
+    }
+    async wait(condition, timeout = 5e3, check = 100) {
+      return waitFor(condition, timeout, check);
+    }
+    containsPermission(permissions) {
+      return new Promise((resolve) => {
+        chrome.permissions.contains(permissions, resolve);
+      });
+    }
+    /**
+     * Asks for the optional permissions required for all extra sites.
+     * It also starts the content script registrations.
+     * 
+     * For now, it is just SB.config.invidiousInstances.
+     * 
+     * @param {CallableFunction} callback
+     */
+    setupExtraSitePermissions(callback) {
+      const permissions = [];
+      if (isSafari()) {
+        permissions.push("webNavigation");
+      }
+      chrome.permissions.request({
+        origins: this.getPermissionRegex(),
+        permissions
+      }, async (granted) => {
+        if (granted) {
+          this.setupExtraSiteContentScripts();
+        } else {
+          this.removeExtraSiteRegistration();
+        }
+        callback(granted);
+      });
+    }
+    getExtraSiteRegistration() {
+      return {
+        message: "registerContentScript",
+        id: "invidious",
+        allFrames: true,
+        js: this.js,
+        css: this.css,
+        matches: this.getPermissionRegex()
+      };
+    }
+    /**
+     * Registers the content scripts for the extra sites.
+     * Will use a different method depending on the browser.
+     * This is called by setupExtraSitePermissions().
+     * 
+     * For now, it is just SB.config.invidiousInstances.
+     */
+    setupExtraSiteContentScripts() {
+      const registration = this.getExtraSiteRegistration();
+      if (this.backgroundScriptContainer) {
+        this.backgroundScriptContainer.registerFirefoxContentScript(registration);
+      } else {
+        chrome.runtime.sendMessage(registration);
+      }
+    }
+    /**
+     * Removes the permission and content script registration.
+     */
+    removeExtraSiteRegistration() {
+      const id = "invidious";
+      if (this.backgroundScriptContainer) {
+        this.backgroundScriptContainer.unregisterFirefoxContentScript(id);
+      } else {
+        chrome.runtime.sendMessage({
+          message: "unregisterContentScript",
+          id
+        });
+      }
+      chrome.permissions.remove({
+        origins: this.getPermissionRegex()
+      });
+    }
+    applyInvidiousPermissions(enable, option = "supportInvidious") {
+      return new Promise((resolve) => {
+        if (enable) {
+          this.setupExtraSitePermissions((granted) => {
+            if (!granted) {
+              Config.config[option] = false;
+            }
+            resolve(granted);
+          });
+        } else {
+          this.removeExtraSiteRegistration();
+          resolve(false);
+        }
+      });
+    }
+    containsInvidiousPermission() {
+      return new Promise((resolve) => {
+        const permissions = [];
+        if (isSafari()) {
+          permissions.push("webNavigation");
+        }
+        chrome.permissions.contains({
+          origins: this.getPermissionRegex(),
+          permissions
+        }, function(result) {
+          resolve(result);
+        });
+      });
+    }
+    /**
+     * Merges any overlapping timestamp ranges into single segments and returns them as a new array.
+     */
+    getMergedTimestamps(timestamps) {
+      let deduped = [];
+      timestamps.forEach((range) => {
+        const startOverlaps = deduped.findIndex((other) => range[0] >= other[0] && range[0] <= other[1]);
+        const endOverlaps = deduped.findIndex((other) => range[1] >= other[0] && range[1] <= other[1]);
+        if (~startOverlaps && ~endOverlaps) {
+          if (startOverlaps === endOverlaps) return;
+          const other1 = deduped.splice(Math.max(startOverlaps, endOverlaps), 1)[0];
+          const other2 = deduped.splice(Math.min(startOverlaps, endOverlaps), 1)[0];
+          deduped.push([Math.min(other1[0], other2[0]), Math.max(other1[1], other2[1])]);
+        } else if (~startOverlaps) {
+          deduped[startOverlaps][1] = range[1];
+        } else if (~endOverlaps) {
+          deduped[endOverlaps][0] = range[0];
+        } else {
+          deduped.push(range.slice());
+        }
+        deduped = deduped.filter((other) => !(other[0] > range[0] && other[1] < range[1]));
+      });
+      return deduped;
+    }
+    /**
+     * Returns the total duration of the timestamps, taking into account overlaps.
+     */
+    getTimestampsDuration(timestamps) {
+      return this.getMergedTimestamps(timestamps).reduce((acc, range) => {
+        return acc + range[1] - range[0];
+      }, 0);
+    }
+    getSponsorIndexFromUUID(sponsorTimes, UUID) {
+      for (let i = 0; i < sponsorTimes.length; i++) {
+        if (sponsorTimes[i].UUID && (sponsorTimes[i].UUID.startsWith(UUID) || UUID.startsWith(sponsorTimes[i].UUID))) {
+          return i;
+        }
+      }
+      return -1;
+    }
+    getSponsorTimeFromUUID(sponsorTimes, UUID) {
+      return sponsorTimes[this.getSponsorIndexFromUUID(sponsorTimes, UUID)];
+    }
+    /**
+     * @returns {String[]} Domains in regex form
+     */
+    getPermissionRegex(domains = []) {
+      const permissionRegex = [];
+      if (domains.length === 0) {
+        domains = [...Config.config.invidiousInstances];
+      }
+      for (const url of domains) {
+        permissionRegex.push("https://*." + url + "/*");
+        permissionRegex.push("http://*." + url + "/*");
+      }
+      return permissionRegex;
+    }
+    findReferenceNode() {
+      const selectors = [
+        "#player-container-id",
+        // Mobile YouTube
+        "#movie_player",
+        ".html5-video-player",
+        // May 2023 Card-Based YouTube Layout
+        "#c4-player",
+        // Channel Trailer
+        "#player-container",
+        // Preview on hover
+        "#main-panel.ytmusic-player-page",
+        // YouTube music
+        "#player-container .video-js",
+        // Invidious
+        ".main-video-section > .video-container",
+        // Cloudtube
+        ".shaka-video-container",
+        // Piped
+        "#player-container.ytk-player",
+        // YT Kids
+        "#id-tv-container"
+        // YTTV
+      ];
+      let referenceNode = findValidElementFromSelector(selectors);
+      if (referenceNode == null) {
+        const player = document.getElementById("player");
+        referenceNode = player?.firstChild;
+        if (referenceNode) {
+          let index = 1;
+          while (index < player.children.length && (!referenceNode.classList?.contains("html5-video-player") || !referenceNode.classList?.contains("ytp-embed"))) {
+            referenceNode = player.children[index];
+            index++;
+          }
+        }
+      }
+      return referenceNode;
+    }
+    isContentScript() {
+      return window.location.protocol === "http:" || window.location.protocol === "https:";
+    }
+    isHex(num) {
+      return Boolean(num.match(/^[0-9a-f]+$/i));
+    }
+    async addHiddenSegment(videoID, segmentUUID, hidden) {
+      if (chrome.extension.inIncognitoContext && !Config.config.trackDownvotesInPrivate || !Config.config.trackDownvotes) return;
+      if (segmentUUID.length < 60) {
+        let segmentIDData;
+        try {
+          segmentIDData = await asyncRequestToServer$1("GET", "/api/segmentID", {
+            UUID: segmentUUID,
+            videoID
+          });
+        } catch (e) {
+          console.error("[SB] Caught error while trying to resolve the segment UUID to be hidden", e);
+          alert(`${chrome.i18n.getMessage("segmentHideFailed")}
+${formatJSErrorMessage(e)}`);
+          return;
+        }
+        if (segmentIDData.ok && segmentIDData.responseText) {
+          segmentUUID = segmentIDData.responseText;
+        } else {
+          logRequest(segmentIDData, "SB", "segment UUID resolution");
+          alert(`${chrome.i18n.getMessage("segmentHideFailed")}
+${getLongErrorMessage(segmentIDData.status, segmentIDData.responseText)}`);
+          return;
+        }
+      }
+      const hashedVideoID = (await getHash(videoID, 1)).slice(0, 4);
+      const UUIDHash = await getHash(segmentUUID, 1);
+      const allDownvotes = Config.local.downvotedSegments;
+      const currentVideoData = allDownvotes[hashedVideoID] || { segments: [], lastAccess: 0 };
+      currentVideoData.lastAccess = Date.now();
+      const existingData = currentVideoData.segments.find((segment) => segment.uuid === UUIDHash);
+      if (hidden === SponsorHideType.Visible) {
+        currentVideoData.segments.splice(currentVideoData.segments.indexOf(existingData), 1);
+        if (currentVideoData.segments.length === 0) {
+          delete allDownvotes[hashedVideoID];
+        }
+      } else {
+        if (existingData) {
+          existingData.hidden = hidden;
+        } else {
+          currentVideoData.segments.push({
+            uuid: UUIDHash,
+            hidden
+          });
+        }
+        allDownvotes[hashedVideoID] = currentVideoData;
+      }
+      const entries = Object.entries(allDownvotes);
+      if (entries.length > 1e4) {
+        let min = null;
+        for (let i = 0; i < entries[0].length; i++) {
+          if (min === null || entries[i][1].lastAccess < min[1].lastAccess) {
+            min = entries[i];
+          }
+        }
+        delete allDownvotes[min[0]];
+      }
+      Config.forceLocalUpdate("downvotedSegments");
+    }
+  }
+
+  function getExtensionIdsToImportFrom() {
+    if (isSafari()) {
+      return extensionImportList.safari;
+    } else if (isFirefoxOrSafari()) {
+      return extensionImportList.firefox;
+    } else {
+      return extensionImportList.chromium;
+    }
+  }
+
+  const chromeP = typeof browser === "undefined" ? typeof chrome !== "undefined" ? chrome : null : browser;
+
+  async function injectUpdatedScripts(extraScripts = [], ignoreNormalScipts = false) {
+    const scripts = ignoreNormalScipts ? extraScripts : extraScripts.concat(chrome.runtime.getManifest().content_scripts || []);
+    if ("scripting" in chrome) {
+      for (const cs of scripts) {
+        for (const tab of await chromeP.tabs.query({ url: cs.matches })) {
+          if (cs.css && cs.css.length > 0) {
+            await chromeP.scripting.insertCSS({
+              target: { tabId: tab.id },
+              files: cs.css || []
+            });
+          }
+          await chromeP.scripting.executeScript({
+            target: { tabId: tab.id },
+            files: cs.js || [],
+            world: cs["world"] || "ISOLATED"
+          });
+        }
+      }
+    } else {
+      chrome.windows.getAll({
+        populate: true
+      }, (windows) => {
+        for (const window2 of windows) {
+          if (window2.tabs) {
+            for (const tab of window2.tabs) {
+              for (const script of scripts) {
+                if (tab.url && script.matches?.some?.((match) => tab.url.match(match.replace(/\//g, "\\/").replace(/\./g, "\\.").replace(/\*/g, ".*")))) {
+                  if (script.js) {
+                    for (const file of script.js) {
+                      void chrome.tabs.executeScript(tab.id, {
+                        file
+                      });
+                    }
+                  }
+                  if (script.css) {
+                    for (const file of script.css) {
+                      void chrome.tabs.insertCSS(tab.id, {
+                        file
+                      });
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+  }
+
+  if (typeof window !== "undefined") {
+    window["SBLogs"] = {
+      debug: [],
+      warn: []
+    };
+  }
+  function logWarn(message) {
+    if (typeof window !== "undefined") {
+      window["SBLogs"].warn.push(`[${(/* @__PURE__ */ new Date()).toISOString()}] ${message}`);
+    } else {
+      console.warn(`[${(/* @__PURE__ */ new Date()).toISOString()}] ${message}`);
+    }
+  }
+
+  const utils = new Utils({
+    registerFirefoxContentScript,
+    unregisterFirefoxContentScript
   });
-})();
-
-// Keep service worker alive to prevent tab-update listener gaps
-(function keepAlive() {
-  try {
-    if (chrome.alarms) {
-      chrome.alarms.create('keepAlive', { periodInMinutes: 1 });
-      chrome.alarms.onAlarm.addListener(() => {});
+  const popupPort = {};
+  const contentScriptRegistrations = {};
+  utils.wait(() => Config.isReady()).then(function() {
+    if (Config.config.supportInvidious) utils.setupExtraSiteContentScripts();
+  });
+  setupBackgroundRequestProxy();
+  setupTabUpdates(Config);
+  if (!globalThis.__OSB_MAIN_ONMESSAGE) {
+    globalThis.__OSB_MAIN_ONMESSAGE = true;
+    chrome.runtime.onMessage.addListener(function(request, sender, callback) {
+      switch (request.message) {
+        case "openConfig":
+          chrome.tabs.create({ url: chrome.runtime.getURL("options/options.html" + (request.hash ? "#" + request.hash : "")) });
+          return false;
+        case "openHelp":
+          chrome.tabs.create({ url: chrome.runtime.getURL("help/index.html") });
+          return false;
+        case "openPage":
+          chrome.tabs.create({ url: chrome.runtime.getURL(request.url) });
+          return false;
+        case "submitVote":
+          submitVote(request.type, request.UUID, request.category, request.videoID).then(callback);
+          return true;
+        case "registerContentScript":
+          registerFirefoxContentScript(request);
+          return false;
+        case "unregisterContentScript":
+          unregisterFirefoxContentScript(request.id);
+          return false;
+        case "tabs": {
+          chrome.tabs.query({
+            active: true,
+            currentWindow: true
+          }, (tabs) => {
+            chrome.tabs.sendMessage(
+              tabs[0].id,
+              request.data,
+              (response) => {
+                callback(response);
+              }
+            );
+          });
+          return true;
+        }
+        case "time":
+        case "infoUpdated":
+        case "videoChanged":
+          if (sender.tab) {
+            try {
+              popupPort[sender.tab.id]?.postMessage(request);
+            } catch (e) {
+            }
+          }
+          return false;
+        default:
+          return false;
+      }
+    });
+  }
+  if (!globalThis.__OSB_MAIN_ONMESSAGEEXTERNAL) {
+    globalThis.__OSB_MAIN_ONMESSAGEEXTERNAL = true;
+    chrome.runtime.onMessageExternal.addListener((request, sender, callback) => {
+      if (getExtensionIdsToImportFrom().includes(sender.id)) {
+        if (request.message === "requestConfig") {
+          callback({
+            userID: Config.config.userID,
+            allowExpirements: Config.config.allowExpirements,
+            showDonationLink: Config.config.showDonationLink,
+            showUpsells: Config.config.showUpsells,
+            darkMode: Config.config.darkMode
+          });
+        }
+      }
+    });
+  }
+  if (!globalThis.__OSB_MAIN_ONCONNECT) {
+    globalThis.__OSB_MAIN_ONCONNECT = true;
+    chrome.runtime.onConnect.addListener((port) => {
+      if (port.name === "popup") {
+        chrome.tabs.query({
+          active: true,
+          currentWindow: true
+        }, (tabs) => {
+          popupPort[tabs[0].id] = port;
+        });
+      }
+    });
+  }
+  chrome.runtime.onInstalled.addListener(function() {
+    setTimeout(async () => {
+      const userID = Config.config.userID;
+      if (!userID && !Config.local.alreadyInstalled) {
+        chrome.tabs.create({ url: chrome.runtime.getURL("/help/index.html") });
+        const newUserID = generateUserID();
+        Config.config.userID = newUserID;
+        Config.local.alreadyInstalled = true;
+        Config.config.categoryPillUpdate = true;
+      }
+      if (Config.config.supportInvidious) {
+        if (!await utils.containsInvidiousPermission()) {
+          chrome.tabs.create({ url: chrome.runtime.getURL("/permissions/index.html") });
+        }
+      }
+      getHash(Config.config.userID).then((userID2) => {
+        if (userID2 == "60eed03c8644b7efa32df06977b3a4c11b62f63518e74a0e29baa1fd449cb54f" || userID2 == "e347d9878bc4c8400d2d9e1164b1f2e630b04a4ca10f1a9270969a9d53da6ebb") {
+          Config.config.prideTheme = true;
+        }
+      });
+    }, 1500);
+    if (!isFirefoxOrSafari()) {
+      injectUpdatedScripts().catch(logWarn);
+      waitFor(() => Config.isReady()).then(() => {
+        if (Config.config.supportInvidious) {
+          injectUpdatedScripts([
+            utils.getExtraSiteRegistration()
+          ]);
+        }
+      }).catch(logWarn);
     }
-  } catch(e) {}
-})();
-
-// Nudge Chrome to check self-hosted updates (manifest update_url); no-op on Firefox / store builds.
-(function requestSelfHostedUpdateCheck() {
-  try {
-    if (typeof chrome.runtime.requestUpdateCheck !== 'function') return;
-    const url = chrome.runtime.getManifest().update_url;
-    if (!url) return;
-    // Skip Chrome Web Store update service only — do not use url.includes('google.com')
-    // (that would wrongly skip hosts like notgoogle.com).
-    let host = '';
+  });
+  async function registerFirefoxContentScript(options) {
+    if ("scripting" in chrome && "getRegisteredContentScripts" in chrome.scripting) {
+      const existingRegistrations = await chromeP.scripting.getRegisteredContentScripts({
+        ids: [options.id]
+      }).catch(() => []);
+      if (existingRegistrations && existingRegistrations.length > 0 && options.matches.every((match) => existingRegistrations[0].matches.includes(match))) {
+        return;
+      }
+    }
+    await unregisterFirefoxContentScript(options.id);
+    if ("scripting" in chrome && "getRegisteredContentScripts" in chrome.scripting) {
+      await chromeP.scripting.registerContentScripts([{
+        id: options.id,
+        runAt: "document_start",
+        matches: options.matches,
+        allFrames: options.allFrames,
+        js: options.js,
+        css: options.css,
+        persistAcrossSessions: true
+      }]);
+    } else {
+      chrome.contentScripts.register({
+        allFrames: options.allFrames,
+        js: options.js?.map?.((file) => ({ file })),
+        css: options.css?.map?.((file) => ({ file })),
+        matches: options.matches
+      }).then((registration) => void (contentScriptRegistrations[options.id] = registration));
+    }
+  }
+  async function unregisterFirefoxContentScript(id) {
+    if ("scripting" in chrome && "getRegisteredContentScripts" in chrome.scripting) {
+      try {
+        await chromeP.scripting.unregisterContentScripts({
+          ids: [id]
+        });
+      } catch (e) {
+      }
+    } else {
+      if (contentScriptRegistrations[id]) {
+        contentScriptRegistrations[id].unregister();
+        delete contentScriptRegistrations[id];
+      }
+    }
+  }
+  async function submitVote(type, UUID, category, videoID) {
+    let userID = Config.config.userID;
+    if (userID == void 0 || userID === "undefined") {
+      userID = generateUserID();
+      Config.config.userID = userID;
+    }
+    const typeSection = type !== void 0 ? "&type=" + type : "&category=" + category;
     try {
-      host = new URL(url).hostname;
+      const response = await asyncRequestToServer("POST", "/api/voteOnSponsorTime?UUID=" + UUID + "&videoID=" + videoID + "&userID=" + userID + typeSection);
+      return {
+        status: response.status,
+        ok: response.ok,
+        responseText: await response.text()
+      };
     } catch (e) {
-      return;
+      console.error("Error while voting:", e);
+      return {
+        error: serializeOrStringify(e)
+      };
     }
-    if (/^clients\d*\.google\.com$/i.test(host)) return;
-    chrome.runtime.requestUpdateCheck(function () {});
-  } catch (e) {}
+  }
+  async function asyncRequestToServer(type, address, data = {}) {
+    const serverAddress = Config.config.testingServer ? testingServerAddress : Config.config.serverAddress;
+    return await sendRealRequestToCustomServer(type, serverAddress + address, data);
+  }
+
+  const CACHE_MAX_SIZE = 500;
+  const CACHE_EVICT_COUNT = 75;
+  const CACHE_TTL_MS = 60 * 60 * 1e3;
+  const CACHE_PREFIX = "sb_cache_";
+  const cacheGet = async (key) => {
+    const fullKey = CACHE_PREFIX + key;
+    const result = await chrome.storage.local.get(fullKey);
+    const entry = result[fullKey];
+    if (!entry) return void 0;
+    if (Date.now() - entry.insertedAt > CACHE_TTL_MS) {
+      await chrome.storage.local.remove(fullKey);
+      return void 0;
+    }
+    await chrome.storage.local.set({
+      [fullKey]: { data: entry.data, insertedAt: Date.now() }
+    });
+    return entry.data;
+  };
+  const cacheSet = async (key, data) => {
+    const fullKey = CACHE_PREFIX + key;
+    await chrome.storage.local.set({
+      [fullKey]: { data, insertedAt: Date.now() }
+    });
+  };
+  const evictCache = async () => {
+    const allData = await chrome.storage.local.get(null);
+    const now = Date.now();
+    const cacheEntries = [];
+    for (const [key, entry] of Object.entries(allData)) {
+      if (key.startsWith(CACHE_PREFIX)) {
+        if (now - entry.insertedAt > CACHE_TTL_MS) {
+          await chrome.storage.local.remove(key);
+        } else {
+          cacheEntries.push({ key, insertedAt: entry.insertedAt });
+        }
+      }
+    }
+    if (cacheEntries.length > CACHE_MAX_SIZE) {
+      cacheEntries.sort((a, b) => a.insertedAt - b.insertedAt);
+      const excess = cacheEntries.length - CACHE_MAX_SIZE;
+      const itemsToRemove = Math.max(CACHE_EVICT_COUNT, excess);
+      const keysToRemove = cacheEntries.slice(0, itemsToRemove).map((e) => e.key);
+      await chrome.storage.local.remove(keysToRemove);
+    }
+  };
+  const getRuntimeConfig = async () => {
+    try {
+      const response = await fetch(chrome.runtime.getURL("config.json"));
+      if (!response.ok) throw new Error("Missing config");
+      const parsed = await response.json();
+      return {
+        serverAddress: parsed.serverAddress || API_BASE_URL
+      };
+    } catch (_error) {
+      return { serverAddress: API_BASE_URL };
+    }
+  };
+  const fetchSegments = async ({ videoId, service, platform }) => {
+    const settings = await getSettings();
+    const config = await getRuntimeConfig();
+    const enabledCategories = CATEGORY_KEYS.filter((cat) => settings[platform]?.[cat]).sort();
+    const key = `${service}:${videoId}:${enabledCategories.join(",")}`;
+    const cached = await cacheGet(key);
+    if (cached !== void 0) return cached;
+    const params = new URLSearchParams({
+      videoID: videoId,
+      service,
+      categories: JSON.stringify(enabledCategories)
+    });
+    const response = await fetch(`${config.serverAddress}/api/skipSegments?${params.toString()}`);
+    if (!response.ok) {
+      if (response.status === 404) {
+        await cacheSet(key, []);
+        return [];
+      }
+      throw new Error(`SponsorBlock API error (${response.status})`);
+    }
+    const payload = await response.json();
+    await cacheSet(key, payload);
+    return payload;
+  };
+  chrome.runtime.onInstalled.addListener(async () => {
+    const settings = await getSettings();
+    await setSettings(settings);
+    chrome.alarms.create("cacheCleanup", { periodInMinutes: 30 });
+  });
+  chrome.alarms.onAlarm.addListener((alarm) => {
+    if (alarm.name === "cacheCleanup") {
+      evictCache();
+    }
+  });
+  chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+    if (message.type === "GET_SEGMENTS") {
+      fetchSegments(message.payload).then((segments) => sendResponse({ ok: true, data: segments })).catch((error) => sendResponse({ ok: false, error: String(error) }));
+      return true;
+    }
+    if (message.type === "GET_SETTINGS") {
+      getSettings().then((settings) => sendResponse({ ok: true, data: settings }));
+      return true;
+    }
+    if (message.type === "SET_SETTINGS") {
+      setSettings(message.payload).then(() => sendResponse({ ok: true }));
+      return true;
+    }
+    return false;
+  });
+
 })();
-//# sourceMappingURL=background.js.map

@@ -17,7 +17,9 @@ const contentScriptRegistrations = {};
 setupBackgroundRequestProxy();
 setupTabUpdates(Config);
 
-chrome.runtime.onMessage.addListener(function (request, sender, callback) {
+if (!globalThis.__OSB_MAIN_ONMESSAGE) {
+    globalThis.__OSB_MAIN_ONMESSAGE = true;
+    chrome.runtime.onMessage.addListener(function (request, sender, callback) {
     switch(request.message) {
         case "openConfig":
             chrome.tabs.create({url: chrome.runtime.getURL('options/options.html' + (request.hash ? '#' + request.hash : ''))});
@@ -68,9 +70,12 @@ chrome.runtime.onMessage.addListener(function (request, sender, callback) {
         default:
             return false;
 	}
-});
+    });
+}
 
-chrome.runtime.onConnect.addListener((port) => {
+if (!globalThis.__OSB_MAIN_ONCONNECT) {
+    globalThis.__OSB_MAIN_ONCONNECT = true;
+    chrome.runtime.onConnect.addListener((port) => {
     if (port.name === "popup") {
         chrome.tabs.query({
             active: true,
@@ -79,7 +84,8 @@ chrome.runtime.onConnect.addListener((port) => {
             popupPort[tabs[0].id] = port;
         });
     }
-});
+    });
+}
 
 //add help page on install
 chrome.runtime.onInstalled.addListener(function () {

@@ -84,6 +84,8 @@ export function serializeOrStringify<T>(value: T & MaybeError): T | string {
 }
 
 export function setupBackgroundRequestProxy() {
+    if (globalThis.__OSB_PROXY_SETUP) return;
+    globalThis.__OSB_PROXY_SETUP = true;
     chrome.runtime.onMessage.addListener((request, sender, callback) => {
         if (request.message === "sendRequest") {
             sendRealRequestToCustomServer(request.type, request.url, request.data, request.headers).then(async (response) => {
