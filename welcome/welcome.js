@@ -6,6 +6,16 @@
   const GITHUB_API_URL = `https://api.github.com/repos/${GITHUB_REPO}/releases/latest`;
   const RELEASES_URL   = `https://github.com/${GITHUB_REPO}/releases/latest`;
 
+  // ── Parallax Background Orbs ──────────────────────────────────────────────────
+  const bgOrbs = document.querySelector('.bg-orbs');
+  if (bgOrbs) {
+    document.addEventListener('mousemove', function (e) {
+      const x = (e.clientX / window.innerWidth - 0.5) * 30;
+      const y = (e.clientY / window.innerHeight - 0.5) * 30;
+      bgOrbs.style.transform = `translate(${x}px, ${y}px)`;
+    });
+  }
+
   // ── Show installed version ──────────────────────────────────────────────────
   const manifest = (typeof chrome !== "undefined" && chrome.runtime && chrome.runtime.getManifest) ? chrome.runtime.getManifest() : null;
   const currentVersion = manifest ? manifest.version : "1.0.28";
