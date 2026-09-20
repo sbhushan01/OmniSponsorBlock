@@ -29,8 +29,8 @@ const render = (settings, container) => {
       const labelText = document.createElement("span");
       labelText.textContent = CATEGORY_LABELS[category];
 
-      row.appendChild(checkbox);
       row.appendChild(labelText);
+      row.appendChild(checkbox);
       section.appendChild(row);
     });
 

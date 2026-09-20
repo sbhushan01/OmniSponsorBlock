@@ -279,7 +279,8 @@ section h3 {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 8px 0;
+  padding: 12px 8px;
+  margin: 0 -8px;
   cursor: pointer;
   border-radius: 8px;
   transition: background 0.2s;
@@ -287,10 +288,6 @@ section h3 {
 
 .row:hover {
   background: var(--sb-glass-hover);
-  padding-left: 8px;
-  padding-right: 8px;
-  margin-left: -8px;
-  margin-right: -8px;
 }
 
 .row span {
@@ -333,7 +330,7 @@ section h3 {
 }
 
 .row input[type="checkbox"]:checked::before {
-  left: 20px;
+  left: 22px;
   background: #ffffff;
   box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }

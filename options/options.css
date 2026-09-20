@@ -165,7 +165,7 @@ a:hover {
 /* Fix for mobile screens */
 @media (max-width: 520px) {
     #options {
-        padding: 20px 16px; /* Reduced from 50px */
+        padding: 24px 20px;
     }
     
     #title {
