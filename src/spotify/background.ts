@@ -87,29 +87,7 @@ if (!globalThis.__OSB_MAIN_ONCONNECT) {
     });
 }
 
-//add help page on install
-chrome.runtime.onInstalled.addListener(function () {
-    // This let's the config sync to run fully before checking.
-    // This is required on Firefox
-    setTimeout(async () => {
-        const userID = Config.config.userID;
 
-        // If there is no userID, then it is the first install.
-        if (!userID && !Config.local.alreadyInstalled){
-            //open up the install page
-            chrome.tabs.create({url: chrome.runtime.getURL("/welcome/welcome.html")});
-
-            //generate a userID
-            const newUserID = generateUserID();
-            //save this UUID
-            Config.config.userID = newUserID;
-            Config.local.alreadyInstalled = true;
-
-            // Don't show update notification
-            Config.config.categoryPillUpdate = true;
-        }
-    }, 1500);
-});
 
 /**
  * Only works on Firefox.

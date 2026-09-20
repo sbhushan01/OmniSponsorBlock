@@ -1149,18 +1149,7 @@
       }
     });
   }
-  chrome.runtime.onInstalled.addListener(function() {
-    setTimeout(async () => {
-      const userID = Config$1.config.userID;
-      if (!userID && !Config$1.local.alreadyInstalled) {
-        chrome.tabs.create({ url: chrome.runtime.getURL("/welcome/welcome.html") });
-        const newUserID = generateUserID$1();
-        Config$1.config.userID = newUserID;
-        Config$1.local.alreadyInstalled = true;
-        Config$1.config.categoryPillUpdate = true;
-      }
-    }, 1500);
-  });
+
   async function registerFirefoxContentScript$1(options) {
     if ("scripting" in chrome && "getRegisteredContentScripts" in chrome.scripting) {
       const existingRegistrations = await chromeP$1.scripting.getRegisteredContentScripts({

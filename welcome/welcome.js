@@ -19,8 +19,8 @@
   const getStartedBtn = document.getElementById("get-started-btn");
   if (getStartedBtn) {
     getStartedBtn.addEventListener("click", function () {
-      if (typeof chrome !== "undefined" && chrome.runtime && chrome.runtime.sendMessage) {
-        chrome.runtime.sendMessage({ message: "openConfig" });
+      if (typeof chrome !== "undefined" && chrome.runtime && chrome.runtime.openOptionsPage) {
+        chrome.runtime.openOptionsPage();
       } else {
         alert("Configuration is only available when running as an extension.");
       }
