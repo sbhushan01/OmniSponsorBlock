@@ -131,7 +131,6 @@
 	float: left;
 	vertical-align:middle;
 	padding: 2px 5px;
-
 	margin-right: 4px;
 }
 
@@ -223,9 +222,6 @@
 	align-items: center;
 }
 
-/*
- * Buttons that appear under a segment on click
- */
 .voteButton {
 	height: 20px;
 	padding: 0 5px;
@@ -234,4 +230,110 @@
 
 .voteButton:hover {
 	opacity: 0.8;
+}
+
+/* ── UI Components shared between options and popup ── */
+:root {
+  --sb-bg: #09090b;
+  --sb-glass-bg: rgba(24, 24, 27, 0.45);
+  --sb-glass-border: rgba(255, 255, 255, 0.08);
+  --sb-glass-hover: rgba(39, 39, 42, 0.6);
+  --sb-text: #e4e4e7;
+  --sb-text-muted: #a1a1aa;
+  --sb-title: #ffffff;
+  
+  --sb-accent: #e11d48;
+  --sb-accent-hover: #f43f5e;
+  
+  --sb-gradient-start: #e11d48;
+  --sb-gradient-end: #7c3aed;
+  
+  --sb-font: "Outfit", system-ui, sans-serif;
+}
+
+section {
+  background: var(--sb-glass-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--sb-glass-border);
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  margin-bottom: 20px;
+  color: var(--sb-text);
+  font-family: var(--sb-font);
+}
+
+section h3 {
+  margin: 0 0 16px 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--sb-title);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--sb-glass-border);
+  padding-bottom: 8px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background 0.2s;
+}
+
+.row:hover {
+  background: var(--sb-glass-hover);
+  padding-left: 8px;
+  padding-right: 8px;
+  margin-left: -8px;
+  margin-right: -8px;
+}
+
+.row span {
+  font-size: 0.95rem;
+  font-weight: 500;
+  flex: 1;
+}
+
+.row input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 40px;
+  height: 22px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  position: relative;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.3s ease;
+  border: 1px solid var(--sb-glass-border);
+  margin-left: 12px;
+  flex-shrink: 0;
+}
+
+.row input[type="checkbox"]::before {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  background: #a1a1aa;
+  border-radius: 50%;
+  transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+.row input[type="checkbox"]:checked {
+  background: linear-gradient(135deg, var(--sb-gradient-start), var(--sb-gradient-end));
+  border-color: transparent;
+}
+
+.row input[type="checkbox"]:checked::before {
+  left: 20px;
+  background: #ffffff;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
